@@ -122,15 +122,4 @@ Examples:
 	return cmd
 }
 
-// attachmentUploadCmd is implemented in writes.go (Phase 7). Placeholder here.
-func attachmentUploadCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "upload",
-		Short: "Upload an attachment (Phase 7)",
-		Long: `Upload a new attachment to a page.
-
-Examples:
-  confluence attachment upload --page 12345 --file ./report.pdf`,
-		RunE: func(*cobra.Command, []string) error { return notImplemented("attachment upload") },
-	}
-}
+func attachmentUploadCmd() *cobra.Command { return attachmentUploadCmdReal() }

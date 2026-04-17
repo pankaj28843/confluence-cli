@@ -29,6 +29,7 @@ func groupCmd() *cobra.Command       { return groupCmdReal() }
 func watcherCmd() *cobra.Command     { return watcherCmdReal() }
 func restrictionCmd() *cobra.Command { return restrictionCmdReal() }
 func searchCmd() *cobra.Command      { return searchCmdReal() }
+func apiCmd() *cobra.Command         { return apiCmdReal() }
 
 func doctorCmd() *cobra.Command {
 	return &cobra.Command{
@@ -50,16 +51,3 @@ Examples:
 }
 
 // Still stubbed:
-
-func apiCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "api <path>",
-		Short: "Call any Confluence REST endpoint (escape hatch)",
-		Long: `Issue a raw REST call.
-
-Examples:
-  confluence api /rest/api/user/current`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(*cobra.Command, []string) error { return notImplemented("api") },
-	}
-}
