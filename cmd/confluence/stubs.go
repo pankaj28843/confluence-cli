@@ -28,6 +28,7 @@ func userCmd() *cobra.Command        { return userCmdReal() }
 func groupCmd() *cobra.Command       { return groupCmdReal() }
 func watcherCmd() *cobra.Command     { return watcherCmdReal() }
 func restrictionCmd() *cobra.Command { return restrictionCmdReal() }
+func searchCmd() *cobra.Command      { return searchCmdReal() }
 
 func doctorCmd() *cobra.Command {
 	return &cobra.Command{
@@ -49,23 +50,6 @@ Examples:
 }
 
 // Still stubbed:
-
-func searchCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "search",
-		Short: "Search content, spaces, users, attachments, or all",
-		Long: `Search Confluence.
-
-Examples:
-  confluence search content "release"
-  confluence search all "release process" --json`,
-	}
-	for _, verb := range []string{"content <query>", "spaces <query>", "users <query>", "attachments <query>", "all <query>"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{Use: v, Short: "Stub (Phase 6)", Long: "Stub.\n\nExamples:\n  confluence search " + v, Args: cobra.ExactArgs(1), RunE: func(*cobra.Command, []string) error { return notImplemented("search " + v) }})
-	}
-	return cmd
-}
 
 func apiCmd() *cobra.Command {
 	return &cobra.Command{
