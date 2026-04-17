@@ -19,11 +19,15 @@ func notImplemented(what string) error {
 // implementation via a *Real() function and edits this file.
 //
 // Live groups (edit entries here to point at the real cmd):
-func spaceCmd() *cobra.Command      { return spaceCmdReal() }
-func pageCmd() *cobra.Command       { return pageCmdReal() }
-func attachmentCmd() *cobra.Command { return attachmentCmdReal() }
-func labelCmd() *cobra.Command      { return labelCmdReal() }
-func commentCmd() *cobra.Command    { return commentCmdReal() }
+func spaceCmd() *cobra.Command       { return spaceCmdReal() }
+func pageCmd() *cobra.Command        { return pageCmdReal() }
+func attachmentCmd() *cobra.Command  { return attachmentCmdReal() }
+func labelCmd() *cobra.Command       { return labelCmdReal() }
+func commentCmd() *cobra.Command     { return commentCmdReal() }
+func userCmd() *cobra.Command        { return userCmdReal() }
+func groupCmd() *cobra.Command       { return groupCmdReal() }
+func watcherCmd() *cobra.Command     { return watcherCmdReal() }
+func restrictionCmd() *cobra.Command { return restrictionCmdReal() }
 
 func doctorCmd() *cobra.Command {
 	return &cobra.Command{
@@ -45,70 +49,6 @@ Examples:
 }
 
 // Still stubbed:
-
-func userCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "user",
-		Short: "Users (current, view, search)",
-		Long: `User operations.
-
-Examples:
-  confluence user current
-  confluence user view alice`,
-	}
-	for _, verb := range []string{"current", "view <keyOrName>", "search"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{Use: v, Short: "Stub (Phase 5)", Long: "Stub.\n\nExamples:\n  confluence user " + v, RunE: func(*cobra.Command, []string) error { return notImplemented("user " + v) }})
-	}
-	return cmd
-}
-
-func groupCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "group",
-		Short: "Groups (list, members)",
-		Long: `Group operations.
-
-Examples:
-  confluence group list
-  confluence group members engineering`,
-	}
-	for _, verb := range []string{"list", "members <name>"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{Use: v, Short: "Stub (Phase 5)", Long: "Stub.\n\nExamples:\n  confluence group " + v, RunE: func(*cobra.Command, []string) error { return notImplemented("group " + v) }})
-	}
-	return cmd
-}
-
-func watcherCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "watcher",
-		Short: "Watchers (content, space)",
-		Long: `Watcher operations.
-
-Examples:
-  confluence watcher content --page 12345
-  confluence watcher space --space ENG`,
-	}
-	for _, verb := range []string{"content", "space"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{Use: v, Short: "Stub (Phase 5)", Long: "Stub.\n\nExamples:\n  confluence watcher " + v, RunE: func(*cobra.Command, []string) error { return notImplemented("watcher " + v) }})
-	}
-	return cmd
-}
-
-func restrictionCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "restriction",
-		Short: "Content restrictions (list)",
-		Long: `Restriction operations.
-
-Examples:
-  confluence restriction list --page 12345`,
-	}
-	cmd.AddCommand(&cobra.Command{Use: "list", Short: "Stub (Phase 5)", Long: "Stub.\n\nExamples:\n  confluence restriction list --page 12345", RunE: func(*cobra.Command, []string) error { return notImplemented("restriction list") }})
-	return cmd
-}
 
 func searchCmd() *cobra.Command {
 	cmd := &cobra.Command{
