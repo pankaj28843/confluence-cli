@@ -19,8 +19,11 @@ func notImplemented(what string) error {
 // implementation via a *Real() function and edits this file.
 //
 // Live groups (edit entries here to point at the real cmd):
-func spaceCmd() *cobra.Command { return spaceCmdReal() }
-func pageCmd() *cobra.Command  { return pageCmdReal() }
+func spaceCmd() *cobra.Command      { return spaceCmdReal() }
+func pageCmd() *cobra.Command       { return pageCmdReal() }
+func attachmentCmd() *cobra.Command { return attachmentCmdReal() }
+func labelCmd() *cobra.Command      { return labelCmdReal() }
+func commentCmd() *cobra.Command    { return commentCmdReal() }
 
 func doctorCmd() *cobra.Command {
 	return &cobra.Command{
@@ -42,54 +45,6 @@ Examples:
 }
 
 // Still stubbed:
-
-func attachmentCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "attachment",
-		Short: "Attachments (list, download, upload)",
-		Long: `Attachment operations.
-
-Examples:
-  confluence attachment list --page 12345
-  confluence attachment download --page 12345 --name logo.png`,
-	}
-	for _, verb := range []string{"list", "download", "upload"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{Use: v, Short: "Stub (Phase 4/7)", Long: "Stub.\n\nExamples:\n  confluence attachment " + v, RunE: func(*cobra.Command, []string) error { return notImplemented("attachment " + v) }})
-	}
-	return cmd
-}
-
-func labelCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "label",
-		Short: "Content labels (list, add, remove)",
-		Long: `Label operations.
-
-Examples:
-  confluence label list --page 12345
-  confluence label add --page 12345 --label needs-review`,
-	}
-	for _, verb := range []string{"list", "add", "remove"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{Use: v, Short: "Stub (Phase 4/7)", Long: "Stub.\n\nExamples:\n  confluence label " + v, RunE: func(*cobra.Command, []string) error { return notImplemented("label " + v) }})
-	}
-	return cmd
-}
-
-func commentCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "comment",
-		Short: "Comments (list inline/footer/resolved)",
-		Long: `Comment operations.
-
-Examples:
-  confluence comment list --page 12345
-  confluence comment list --page 12345 --locations footer,inline`,
-	}
-	cmd.AddCommand(&cobra.Command{Use: "list", Short: "Stub (Phase 4)", Long: "Stub.\n\nExamples:\n  confluence comment list --page 12345", RunE: func(*cobra.Command, []string) error { return notImplemented("comment list") }})
-	return cmd
-}
 
 func userCmd() *cobra.Command {
 	cmd := &cobra.Command{
