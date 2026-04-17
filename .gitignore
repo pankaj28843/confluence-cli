@@ -1,0 +1,6 @@
+/confluence
+*.exe
+.DS_Store
+coverage.out
+COVERAGE.txt
+build/
