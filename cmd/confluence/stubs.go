@@ -15,9 +15,12 @@ func notImplemented(what string) error {
 	return fmt.Errorf("%s: not yet implemented", what)
 }
 
-// All command-group placeholders. Each phase replaces its group with real
-// implementations. Keeping stubs here means cmd/confluence/main.go compiles
-// from day one.
+// Command-group factories. Each phase replaces its group with the full
+// implementation via a *Real() function and edits this file.
+//
+// Live groups (edit entries here to point at the real cmd):
+func spaceCmd() *cobra.Command { return spaceCmdReal() }
+func pageCmd() *cobra.Command  { return pageCmdReal() }
 
 func doctorCmd() *cobra.Command {
 	return &cobra.Command{
@@ -38,43 +41,7 @@ Examples:
 	}
 }
 
-func spaceCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "space",
-		Short: "Spaces (list, view)",
-		Long: `Space operations.
-
-Examples:
-  confluence space list
-  confluence space view ENG`,
-	}
-	cmd.AddCommand(&cobra.Command{Use: "list", Short: "List spaces", Long: "List spaces.\n\nExamples:\n  confluence space list --json", RunE: func(*cobra.Command, []string) error { return notImplemented("space list") }})
-	cmd.AddCommand(&cobra.Command{Use: "view <key>", Short: "Show one space", Long: "Show one space by key.\n\nExamples:\n  confluence space view ENG --json", Args: cobra.ExactArgs(1), RunE: func(*cobra.Command, []string) error { return notImplemented("space view") }})
-	return cmd
-}
-
-func pageCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "page",
-		Short: "Pages (view, search, children, ancestors, history, update)",
-		Long: `Page operations.
-
-Examples:
-  confluence page view 12345 --markdown
-  confluence page search --cql "type=page AND space=ENG"
-  confluence page children 12345 --recursive`,
-	}
-	for _, verb := range []string{"view <id>", "search", "children <id>", "ancestors <id>", "history <id>", "update <id>"} {
-		v := verb
-		cmd.AddCommand(&cobra.Command{
-			Use:   v,
-			Short: "Stub (Phase 3/7)",
-			Long:  "Stub.\n\nExamples:\n  confluence page " + v,
-			RunE:  func(*cobra.Command, []string) error { return notImplemented("page " + v) },
-		})
-	}
-	return cmd
-}
+// Still stubbed:
 
 func attachmentCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -192,12 +159,10 @@ func searchCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "search",
 		Short: "Search content, spaces, users, attachments, or all",
-		Long: `Search Confluence. Five sub-verbs — content, spaces, users, attachments, all.
-'all' fans out to the first four in parallel and merges via reciprocal-rank fusion.
+		Long: `Search Confluence.
 
 Examples:
   confluence search content "release"
-  confluence search spaces "engineering"
   confluence search all "release process" --json`,
 	}
 	for _, verb := range []string{"content <query>", "spaces <query>", "users <query>", "attachments <query>", "all <query>"} {
@@ -211,11 +176,10 @@ func apiCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "api <path>",
 		Short: "Call any Confluence REST endpoint (escape hatch)",
-		Long: `Issue a raw REST call. Auto-routes to v1 or v2 on Cloud based on the path.
+		Long: `Issue a raw REST call.
 
 Examples:
-  confluence api /rest/api/user/current
-  confluence api /wiki/api/v2/spaces --param 'limit=10'`,
+  confluence api /rest/api/user/current`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(*cobra.Command, []string) error { return notImplemented("api") },
 	}
