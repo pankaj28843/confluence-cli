@@ -14,6 +14,8 @@ make setup     # installs the pre-commit hook
 
 Requirements: Go 1.25+, `jq` on `$PATH` for `--jq` tests.
 
+Windows developers with a prebuilt `confluence-windows-amd64.exe` can follow `docs/windows-setup/` for local setup.
+
 ## Running the test suite
 
 ```bash

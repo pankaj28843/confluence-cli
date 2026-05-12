@@ -35,6 +35,8 @@ make install          # installs to $HOME/.local/bin/confluence
 confluence version
 ```
 
+Windows developers with a prebuilt `confluence-windows-amd64.exe` can use the developer-only setup guide in `docs/windows-setup/`.
+
 ## Configure
 
 ### Server / Data Center (Bearer PAT)
@@ -226,6 +228,7 @@ make test       # -count=1 -timeout 60s
 make race       # -race
 make coverage   # internal/ coverage report
 make setup      # install pre-commit hook
+make windows    # build build/confluence-windows-amd64.exe for developer setup
 make release    # cross-compile darwin-arm64/amd64, linux-amd64, windows-amd64
 ```
 

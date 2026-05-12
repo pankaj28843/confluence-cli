@@ -1,4 +1,4 @@
-.PHONY: build install uninstall test race coverage lint setup clean release
+.PHONY: build install uninstall test race coverage lint setup clean windows release
 
 BINARY := confluence
 INSTALL_DIR := $(HOME)/.local/bin
@@ -41,6 +41,11 @@ setup:
 	cp scripts/pre-commit .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
 	@echo "Pre-commit hook installed"
+
+windows:
+	@mkdir -p build
+	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w $(LDFLAGS)" -o build/$(BINARY)-windows-amd64.exe ./cmd/confluence/
+	@echo "Built build/$(BINARY)-windows-amd64.exe"
 
 release:
 	@mkdir -p build
