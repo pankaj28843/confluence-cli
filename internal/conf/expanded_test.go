@@ -31,11 +31,13 @@ func TestExpandedReadWrite(t *testing.T) {
 			_ = json.NewEncoder(w).Encode(map[string]any{"results": []Group{{Name: "engineering", Type: "group"}}})
 		case strings.HasPrefix(r.URL.Path, "/rest/api/search"):
 			_ = json.NewEncoder(w).Encode(map[string]any{"results": []SearchHit{{Title: "hit", EntityType: "content"}}})
+		case r.URL.Path == "/rest/api/content/12345/child/attachment/att1/data":
+			_ = json.NewEncoder(w).Encode(Attachment{ID: "att1", Title: "report.pdf"})
 		case strings.HasSuffix(r.URL.Path, "/child/attachment"):
 			if r.Method == http.MethodPost {
-				_ = json.NewEncoder(w).Encode(map[string]any{"results": []Attachment{{ID: "att1", Title: "report.pdf"}}})
+				_ = json.NewEncoder(w).Encode(map[string]any{"results": []Attachment{{ID: "att2", Title: "report.pdf"}}})
 			} else {
-				_ = json.NewEncoder(w).Encode(map[string]any{"results": []Attachment{{ID: "att1", Title: "logo.png"}}})
+				_ = json.NewEncoder(w).Encode(map[string]any{"results": []Attachment{{ID: "att1", Title: "report.pdf"}}})
 			}
 		case strings.HasSuffix(r.URL.Path, "/child/comment"):
 			_ = json.NewEncoder(w).Encode(map[string]any{"results": []any{
@@ -62,6 +64,12 @@ func TestExpandedReadWrite(t *testing.T) {
 			cnt := Content{ID: "12345"}
 			cnt.Version.Number = 5
 			_ = json.NewEncoder(w).Encode(cnt)
+		case r.URL.Path == "/rest/api/content" && r.Method == http.MethodPost:
+			cnt := Content{ID: "67890", Title: "Created", Type: "page"}
+			cnt.Version.Number = 1
+			_ = json.NewEncoder(w).Encode(cnt)
+		case r.URL.Path == "/rest/api/content/att1" && r.Method == http.MethodDelete:
+			_, _ = w.Write([]byte(`{}`))
 		case strings.HasPrefix(r.URL.Path, "/rest/api/content/"):
 			cnt := Content{ID: "12345", Title: "Demo", Type: "page"}
 			cnt.Version.Number = 4
@@ -133,7 +141,15 @@ func TestExpandedReadWrite(t *testing.T) {
 		t.Fatalf("GetContentRestrictions: %v", err)
 	}
 
-	// Writes: page update + attachment upload
+	// Writes: page create/update + attachment update + delete
+	created, err := CreatePage(ctx, c, CreatePageInput{SpaceKey: "ENG", Title: "Created", BodyValue: "<p>x</p>", ParentID: "12345"})
+	if err != nil || created.ID != "67890" {
+		t.Fatalf("CreatePage: %v %+v", err, created)
+	}
+	if lastMethod != http.MethodPost || lastPath != "/rest/api/content" || !strings.Contains(string(lastBody), `"ancestors"`) {
+		t.Fatalf("CreatePage request mismatch: %s %s %s", lastMethod, lastPath, string(lastBody))
+	}
+
 	out, err := UpdatePage(ctx, c, UpdatePageInput{ID: "12345", Title: "New", BodyValue: "<p>x</p>", VersionNumber: 4})
 	if err != nil || out.Version.Number != 5 {
 		t.Fatalf("UpdatePage: %v %+v", err, out)
@@ -146,7 +162,16 @@ func TestExpandedReadWrite(t *testing.T) {
 	if err != nil || atts[0].Title != "report.pdf" {
 		t.Fatalf("UploadAttachment: %v %+v", err, atts)
 	}
+	if lastPath != "/rest/api/content/12345/child/attachment/att1/data" {
+		t.Fatalf("UploadAttachment should update existing attachment, got %s", lastPath)
+	}
 	if !strings.Contains(string(lastBody), "PDF-BYTES") {
 		t.Fatalf("UploadAttachment did not include the file bytes")
+	}
+	if err := DeleteContent(ctx, c, "att1"); err != nil {
+		t.Fatalf("DeleteContent: %v", err)
+	}
+	if lastMethod != http.MethodDelete || lastPath != "/rest/api/content/att1" {
+		t.Fatalf("DeleteContent request mismatch: %s %s", lastMethod, lastPath)
 	}
 }

@@ -87,8 +87,8 @@ Exit codes: `0` healthy, `2` user-fixable config (bad token, missing env),
 |---|---|
 | `doctor` / `version` | Health + identity + build info |
 | `space` | `list`, `view` |
-| `page` | `view --markdown`, `search --cql`, `children --recursive`, `ancestors`, `history`, `versions`, `update` |
-| `attachment` | `list`, `download`, `upload` |
+| `page` | `view --markdown`, `view --body-only`, `search --cql`, `children --recursive`, `ancestors`, `history`, `versions`, `create`, `update`, `publish`, `url`, `screenshot` |
+| `attachment` | `list`, `download`, `upload`, `replace`, `delete` |
 | `label` | `list`, `add`, `remove` |
 | `comment` | `list --locations footer,inline,resolved` |
 | `user` | `current`, `view --username\|--key\|--accountId`, `search` |
@@ -150,12 +150,17 @@ confluence space view ENG
 
 confluence page search --cql "type=page AND space=ENG AND text ~ 'deploy'"
 confluence page view 12345 --markdown
+confluence page view 12345 --body-only > body.html
+confluence page url 12345
+confluence page screenshot 12345 --out verify.png
 confluence page children 12345 --recursive --json
 confluence page ancestors 12345
 
-confluence attachment list --page 12345 --json
+confluence attachment list --page 12345 --name hld.png --json
 confluence attachment download --page 12345 --name logo.png --output ./logo.png
 confluence attachment upload --page 12345 --file ./report.pdf
+confluence attachment replace --page 12345 --file ./report.pdf
+confluence attachment delete --page 12345 --name old-report.pdf --force
 
 confluence label list --page 12345
 confluence label add --page 12345 --label needs-review
@@ -163,8 +168,10 @@ confluence label remove --page 12345 --label needs-review
 
 confluence comment list --page 12345 --locations footer,inline --json
 
+confluence page create --space ENG --title "Runbook" --body-file page.html
 confluence page update 12345 --title "New title"
 echo "<p>Updated body</p>" | confluence page update 12345 --body-format storage --body-file -
+confluence page publish 12345 --body-file page.html --attach diagram.png
 
 confluence search all "release" --json
 ```
@@ -209,15 +216,18 @@ Every command accepts:
 
 ## Write operations
 
-v1 ships a **minimum, safe write surface** — writes that let agents fix
-their own output without risking destructive mistakes:
+v1 ships a practical write surface for documentation workflows:
 
-- `confluence page update` — title and/or body.
+- `confluence page create` — create a page from `--body-file` / stdin, optionally below `--parent`.
+- `confluence page update` — title and/or body with automatic version increment.
+- `confluence page publish` — upload/update attachments, then update the page body.
 - `confluence label add` / `label remove`.
-- `confluence attachment upload`.
+- `confluence attachment list --name` — exact client-side filename filtering.
+- `confluence attachment upload` / `replace` — create or update by filename.
+- `confluence attachment delete` — delete by id or page/name, with confirmation unless `--force`.
 
 Not in v1 (deferred to v2):
-- `page create`, `page delete`, `page move` (tree-breaking).
+- `page delete`, `page move` (tree-breaking).
 - Whiteboards, databases, blogpost lifecycle.
 - OAuth / 3LO / OAuth-bot authentication.
 

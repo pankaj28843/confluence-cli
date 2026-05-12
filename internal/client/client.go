@@ -113,6 +113,13 @@ func (c *Client) Delete(ctx context.Context, path string, params url.Values) ([]
 	return c.do(ctx, http.MethodDelete, path, params, nil, "")
 }
 
+// PostRawReader streams a caller-supplied body with a caller-specified
+// Content-Type. Use it for multipart uploads where buffering large files would
+// be wasteful.
+func (c *Client) PostRawReader(ctx context.Context, path string, params url.Values, body io.Reader, contentType string, extra map[string]string) ([]byte, *http.Header, error) {
+	return c.doRawReader(ctx, http.MethodPost, path, params, body, contentType, extra)
+}
+
 // PostRaw sends raw bytes with a caller-specified Content-Type (for multipart).
 // Extra headers are merged in.
 func (c *Client) PostRaw(ctx context.Context, path string, params url.Values, body []byte, contentType string, extra map[string]string) ([]byte, *http.Header, error) {
@@ -132,13 +139,17 @@ func (c *Client) do(ctx context.Context, method, path string, params url.Values,
 }
 
 func (c *Client) doRaw(ctx context.Context, method, path string, params url.Values, body []byte, contentType string, extra map[string]string) ([]byte, *http.Header, error) {
-	u := c.BuildURL(path, params)
-
 	var reader io.Reader
 	if body != nil {
 		reader = bytes.NewReader(body)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, u, reader)
+	return c.doRawReader(ctx, method, path, params, reader, contentType, extra)
+}
+
+func (c *Client) doRawReader(ctx context.Context, method, path string, params url.Values, body io.Reader, contentType string, extra map[string]string) ([]byte, *http.Header, error) {
+	u := c.BuildURL(path, params)
+
+	req, err := http.NewRequestWithContext(ctx, method, u, body)
 	if err != nil {
 		return nil, nil, err
 	}

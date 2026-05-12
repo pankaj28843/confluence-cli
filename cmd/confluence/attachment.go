@@ -12,22 +12,26 @@ import (
 func attachmentCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "attachment",
-		Short: "Attachments (list, download, upload)",
+		Short: "Attachments (list, download, upload, replace, delete)",
 		Long: `Attachment operations.
 
 Examples:
   confluence attachment list --page 12345
   confluence attachment download --page 12345 --name logo.png --output ./logo.png
-  confluence attachment upload --page 12345 --file ./report.pdf`,
+  confluence attachment upload --page 12345 --file ./report.pdf
+  confluence attachment replace --page 12345 --file ./report.pdf
+  confluence attachment delete --page 12345 --name old.png --force`,
 	}
 	cmd.AddCommand(attachmentListCmd())
 	cmd.AddCommand(attachmentDownloadCmd())
-	cmd.AddCommand(attachmentUploadCmd()) // implemented in writes.go (Phase 7)
+	cmd.AddCommand(attachmentUploadCmd())
+	cmd.AddCommand(attachmentReplaceCmd())
+	cmd.AddCommand(attachmentDeleteCmd())
 	return cmd
 }
 
 func attachmentListCmd() *cobra.Command {
-	var page string
+	var page, name string
 	var limit int
 	cmd := &cobra.Command{
 		Use:   "list",
@@ -36,6 +40,7 @@ func attachmentListCmd() *cobra.Command {
 
 Examples:
   confluence attachment list --page 12345
+  confluence attachment list --page 12345 --name hld.png
   confluence attachment list --page 12345 --json --limit 100`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -54,6 +59,15 @@ Examples:
 			if err != nil {
 				return err
 			}
+			if name != "" {
+				filtered := atts[:0]
+				for _, a := range atts {
+					if a.Title == name {
+						filtered = append(filtered, a)
+					}
+				}
+				atts = filtered
+			}
 			if w.IsJSON() {
 				return w.JSON(atts)
 			}
@@ -64,6 +78,7 @@ Examples:
 		},
 	}
 	cmd.Flags().StringVar(&page, "page", "", "Content id (required)")
+	cmd.Flags().StringVar(&name, "name", "", "Exact attachment file name filter")
 	cmd.Flags().IntVar(&limit, "limit", 50, "Max attachments (hard cap 200)")
 	return cmd
 }
@@ -121,5 +136,3 @@ Examples:
 	cmd.Flags().StringVar(&output, "output", "", "Write to file (default: stdout)")
 	return cmd
 }
-
-func attachmentUploadCmd() *cobra.Command { return attachmentUploadCmdReal() }

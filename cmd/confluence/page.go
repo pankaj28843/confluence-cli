@@ -11,13 +11,16 @@ import (
 func pageCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "page",
-		Short: "Pages (view, search, children, ancestors, history, versions, update)",
+		Short: "Pages (view, search, children, ancestors, history, versions, create, update, publish, url, screenshot)",
 		Long: `Page operations.
 
 Examples:
   confluence page view 12345 --markdown
   confluence page search --cql "type=page AND space=ENG"
-  confluence page children 12345 --recursive`,
+  confluence page children 12345 --recursive
+  confluence page create --space ENG --title "Runbook" --body-file body.html
+  confluence page url 12345
+  confluence page screenshot 12345 --out verify.png`,
 	}
 	cmd.AddCommand(pageViewCmd())
 	cmd.AddCommand(pageSearchCmd())
@@ -25,23 +28,29 @@ Examples:
 	cmd.AddCommand(pageAncestorsCmd())
 	cmd.AddCommand(pageHistoryCmd())
 	cmd.AddCommand(pageVersionsCmd())
-	cmd.AddCommand(pageUpdateCmd()) // implemented in writes.go (Phase 7)
+	cmd.AddCommand(pageCreateCmd())
+	cmd.AddCommand(pageUpdateCmd())
+	cmd.AddCommand(pagePublishCmd())
+	cmd.AddCommand(pageURLCmd())
+	cmd.AddCommand(pageScreenshotCmd())
 	return cmd
 }
 
 func pageViewCmd() *cobra.Command {
-	var markdown, rawStorage bool
+	var markdown, rawStorage, bodyOnly bool
 	var expand string
 	cmd := &cobra.Command{
 		Use:   "view <id>",
 		Short: "Fetch a page (or other content) by id",
 		Long: `Fetch content by id. --markdown renders the storage body to Markdown;
---raw-storage emits the raw Confluence storage XML/HTML.
+--raw-storage emits the raw Confluence storage XML/HTML. --body-only emits only
+raw storage HTML for edit-and-reupload workflows.
 
 Examples:
   confluence page view 12345 --markdown
   confluence page view 12345 --json
-  confluence page view 12345 --raw-storage`,
+  confluence page view 12345 --raw-storage
+  confluence page view 12345 --body-only > body.html`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := newContext()
@@ -55,6 +64,10 @@ Examples:
 			p, err := conf.GetContent(ctx, c, args[0], expand)
 			if err != nil {
 				return err
+			}
+			if bodyOnly {
+				w.Text("%s", p.Body.Storage.Value)
+				return nil
 			}
 			if w.IsJSON() {
 				return w.JSON(p)
@@ -89,7 +102,103 @@ Examples:
 	}
 	cmd.Flags().BoolVar(&markdown, "markdown", false, "Render body as Markdown (default output)")
 	cmd.Flags().BoolVar(&rawStorage, "raw-storage", false, "Emit the raw storage-format XML")
+	cmd.Flags().BoolVar(&bodyOnly, "body-only", false, "Emit only raw storage-format XML/HTML")
 	cmd.Flags().StringVar(&expand, "expand", "", "Override the expand= parameter (default: "+conf.DefaultExpand+")")
+	return cmd
+}
+
+func pageURLCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "url <id>",
+		Short: "Print the browser URL for a page",
+		Long: `Print the absolute browser URL for a page using Confluence's _links.base
+and _links.webui fields.
+
+Examples:
+  confluence page url 12345
+  cdp open "$(confluence page url 12345)" --new-tab=false`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := newContext()
+			defer cancel()
+			w := getWriter()
+			defer w.Finish()
+			c, err := newClient()
+			if err != nil {
+				return err
+			}
+			p, err := conf.GetContent(ctx, c, args[0], "")
+			if err != nil {
+				return err
+			}
+			url := p.AbsoluteURL()
+			if url == "" {
+				return fmt.Errorf("page %s response did not include _links.base/_links.webui", args[0])
+			}
+			if w.IsJSON() {
+				return w.JSON(struct {
+					ID    string `json:"id"`
+					Title string `json:"title,omitempty"`
+					URL   string `json:"url"`
+				}{p.ID, p.Title, url})
+			}
+			w.Text("%s\n", url)
+			return nil
+		},
+	}
+	return cmd
+}
+
+func pageScreenshotCmd() *cobra.Command {
+	var out string
+	var newTab bool
+	cmd := &cobra.Command{
+		Use:   "screenshot <id>",
+		Short: "Capture a full-page browser screenshot via cdp",
+		Long: `Open a page in Chrome via cdp and capture a full-page screenshot. This is a
+peer-tool wrapper; cdp must be installed and authenticated browser state must
+already be available.
+
+Examples:
+  confluence page screenshot 12345 --out verify.png
+  confluence page screenshot 12345 --out verify.png --new-tab=false`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := newContext()
+			defer cancel()
+			w := getWriter()
+			defer w.Finish()
+			if out == "" {
+				return fmt.Errorf("--out is required")
+			}
+			c, err := newClient()
+			if err != nil {
+				return err
+			}
+			p, err := conf.GetContent(ctx, c, args[0], "")
+			if err != nil {
+				return err
+			}
+			url := p.AbsoluteURL()
+			if url == "" {
+				return fmt.Errorf("page %s response did not include _links.base/_links.webui", args[0])
+			}
+			if err := runPageScreenshot(ctx, url, args[0], out, newTab); err != nil {
+				return err
+			}
+			if w.IsJSON() {
+				return w.JSON(struct {
+					ID  string `json:"id"`
+					URL string `json:"url"`
+					Out string `json:"out"`
+				}{args[0], url, out})
+			}
+			w.Text("wrote %s\n", out)
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&out, "out", "", "Path to write screenshot image (required)")
+	cmd.Flags().BoolVar(&newTab, "new-tab", true, "Open a new tab instead of navigating an existing page")
 	return cmd
 }
 
@@ -299,19 +408,4 @@ func buildCQL(space, title string) string {
 		out += fmt.Sprintf(` AND title~"%s"`, title)
 	}
 	return out
-}
-
-// pageUpdateCmd is defined in writes.go (Phase 7). Provide a stub here so the
-// page group compiles during Phase 3.
-func pageUpdateCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "update <id>",
-		Short: "Update a page (Phase 7)",
-		Long: `Update an existing page's title and/or body.
-
-Examples:
-  confluence page update 12345 --title "New Title" --body-format wiki --body-file body.txt`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error { return notImplemented("page update") },
-	}
 }

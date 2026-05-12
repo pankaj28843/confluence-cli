@@ -93,5 +93,4 @@ Cloud) must be exercised for any new client-layer change — see
   example URLs must use `wiki.example.com` (Server/DC) or
   `example.atlassian.net` (Cloud). The pre-push grep scans for common
   leaks and blocks the push.
-- Do not ship `page create` / `page delete` / `page move` in v1.
 - Do not replace `cobra` with another framework.
