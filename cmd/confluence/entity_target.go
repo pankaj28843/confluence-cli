@@ -46,6 +46,13 @@ func addLikeTargetFlags(cmd *cobra.Command, f *entityTargetFlags) {
 	cmd.Flags().StringVar(&f.inlineComment, "inline-comment", "", "Inline comment id")
 }
 
+func addLabelTargetFlags(cmd *cobra.Command, f *entityTargetFlags) {
+	cmd.Flags().StringVar(&f.page, "page", "", "Page id")
+	cmd.Flags().StringVar(&f.blogpost, "blogpost", "", "Blog post id")
+	cmd.Flags().StringVar(&f.attachment, "attachment", "", "Attachment id")
+	cmd.Flags().StringVar(&f.customContent, "custom-content", "", "Custom content id")
+}
+
 func selectedOperationTarget(f entityTargetFlags) (selectedEntityTarget, error) {
 	return selectExactlyOneTarget([]selectedEntityTarget{
 		{typ: "page", id: f.page},
@@ -68,6 +75,15 @@ func selectedLikeTarget(f entityTargetFlags) (selectedEntityTarget, error) {
 		{typ: "blogpost", id: f.blogpost},
 		{typ: "footer-comment", id: f.footerComment},
 		{typ: "inline-comment", id: f.inlineComment},
+	})
+}
+
+func selectedLabelTarget(f entityTargetFlags) (selectedEntityTarget, error) {
+	return selectExactlyOneTarget([]selectedEntityTarget{
+		{typ: "page", id: f.page},
+		{typ: "blogpost", id: f.blogpost},
+		{typ: "attachment", id: f.attachment},
+		{typ: "custom-content", id: f.customContent},
 	})
 }
 

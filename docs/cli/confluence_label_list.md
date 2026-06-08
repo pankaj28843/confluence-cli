@@ -1,6 +1,6 @@
 # confluence label list
 
-List labels on a content id
+List labels on a content target
 
 ## Synopsis
 
@@ -9,7 +9,8 @@ List labels.
 ## Examples
 
 confluence label list --page 12345 --json
-  confluence label list --page 12345 --limit 100
+  confluence label list --blogpost 67890 --prefix global
+  confluence label list --attachment att123 --limit 100
 
 ## Usage
 
@@ -20,8 +21,12 @@ confluence label list [flags]
 ## Options
 
 ```text
-      --limit int     Max labels (hard cap 200) (default 25)
-      --page string   Content id (required)
+      --attachment string       Attachment id
+      --blogpost string         Blog post id
+      --custom-content string   Custom content id
+      --limit int               Max labels (hard cap 200) (default 25)
+      --page string             Page id
+      --prefix string           Label prefix filter
 ```
 
 ## Inherited Options

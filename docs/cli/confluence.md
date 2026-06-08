@@ -61,7 +61,7 @@ confluence
 - `docs` - Generate CLI reference documentation
 - `doctor` - Verify environment, auth, and flavor detection
 - `group` - Groups (list, members)
-- `label` - Content labels (list, add, remove)
+- `label` - Content and space labels
 - `like` - Cloud likes (count, users)
 - `macro` - Macro body utilities
 - `operation` - Permitted operations (list)

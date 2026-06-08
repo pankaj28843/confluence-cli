@@ -126,7 +126,8 @@ func writeMarkdownDoc(cmd *cobra.Command, out string) error {
 		fmt.Fprintf(&b, "## See Also\n\n- [%s](%s.md)\n", commandPath(parent), strings.ReplaceAll(commandPath(parent), " ", "_"))
 	}
 
-	if err := os.WriteFile(path, b.Bytes(), 0o644); err != nil {
+	content := strings.TrimRight(b.String(), "\n") + "\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		return fmt.Errorf("write %s: %w", path, err)
 	}
 	return nil

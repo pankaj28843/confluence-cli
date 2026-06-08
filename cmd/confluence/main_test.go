@@ -54,6 +54,10 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"attachment", "replace"},
 		{"attachment", "delete"},
 		{"label", "list"},
+		{"label", "space"},
+		{"label", "search"},
+		{"label", "recent"},
+		{"label", "related"},
 		{"label", "add"},
 		{"label", "remove"},
 		{"property", "content", "list"},
@@ -117,6 +121,10 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"blogpost", "list"},
 		{"attachment", "list"},
 		{"label", "list"},
+		{"label", "space"},
+		{"label", "search"},
+		{"label", "recent"},
+		{"label", "related"},
 		{"property", "content", "list"},
 		{"property", "space", "list"},
 		{"task", "list"},
@@ -293,6 +301,36 @@ func TestWatcherCommandsHaveTypedReadFlags(t *testing.T) {
 	for _, want := range []string{"--page", "--space", "--account-id", "--content-type"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("watcher status --help missing %s:\n%s", want, help)
+		}
+	}
+}
+
+func TestLabelCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"label", "list"})
+	for _, want := range []string{"--page", "--blogpost", "--attachment", "--custom-content", "--prefix", "--limit"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("label list --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"label", "space"})
+	for _, want := range []string{"--space", "--prefix", "--limit"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("label space --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"label", "search"})
+	for _, want := range []string{"--label-id", "--prefix", "--sort", "--limit"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("label search --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"label", "related"})
+	for _, want := range []string{"--label", "--space", "--limit"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("label related --help missing %s:\n%s", want, help)
 		}
 	}
 }
