@@ -1,14 +1,15 @@
 # confluence watcher space
 
-Watchers subscribed to a space (raw passthrough)
+List watchers subscribed to a space
 
 ## Synopsis
 
-Show watcher records for a space key.
+List watchers subscribed to a space key.
 
 ## Examples
 
-confluence watcher space --space ENG --json
+confluence watcher space --space ENG
+  confluence watcher space --space ENG --json
 
 ## Usage
 
@@ -19,6 +20,7 @@ confluence watcher space [flags]
 ## Options
 
 ```text
+      --limit int      Maximum watchers returned (default 25)
       --space string   Space key (required)
 ```
 

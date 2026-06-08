@@ -1,15 +1,15 @@
 # confluence watcher content
 
-Watchers subscribed to a content id (raw passthrough)
+List watchers subscribed to a content id
 
 ## Synopsis
 
-Show watcher/notification records for a content id. The shape varies
-between Confluence versions, so output is passed through verbatim.
+List watchers subscribed to a content id.
 
 ## Examples
 
-confluence watcher content --page 12345 --json
+confluence watcher content --page 12345
+  confluence watcher content --page 12345 --json
 
 ## Usage
 
@@ -20,6 +20,7 @@ confluence watcher content [flags]
 ## Options
 
 ```text
+      --limit int     Maximum watchers returned (default 25)
       --page string   Content id (required)
 ```
 

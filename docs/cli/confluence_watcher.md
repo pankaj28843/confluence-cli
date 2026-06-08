@@ -1,15 +1,16 @@
 # confluence watcher
 
-Watchers (content, space)
+Watchers (content, space, status)
 
 ## Synopsis
 
-Watcher operations.
+Watcher read helpers.
 
 ## Examples
 
 confluence watcher content --page 12345
   confluence watcher space --space ENG
+  confluence watcher status --page 12345 --json
 
 ## Usage
 
@@ -19,8 +20,9 @@ confluence watcher
 
 ## Commands
 
-- `content` - Watchers subscribed to a content id (raw passthrough)
-- `space` - Watchers subscribed to a space (raw passthrough)
+- `content` - List watchers subscribed to a content id
+- `space` - List watchers subscribed to a space
+- `status` - Show whether a user watches content or a space
 
 ## Inherited Options
 

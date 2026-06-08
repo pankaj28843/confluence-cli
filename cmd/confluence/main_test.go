@@ -90,6 +90,7 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"group", "members"},
 		{"watcher", "content"},
 		{"watcher", "space"},
+		{"watcher", "status"},
 		{"restriction", "list"},
 		{"search", "content"},
 		{"search", "spaces"},
@@ -133,6 +134,9 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"comment", "update"},
 		{"comment", "delete"},
 		{"user", "search"},
+		{"watcher", "content"},
+		{"watcher", "space"},
+		{"watcher", "status"},
 		{"restriction", "list"},
 		{"search", "all"},
 		{"api"},
@@ -270,6 +274,25 @@ func TestRestrictionListHasTypedReadFlags(t *testing.T) {
 	for _, want := range []string{"--operation", "--limit"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("restriction list --help missing %s:\n%s", want, help)
+		}
+	}
+}
+
+func TestWatcherCommandsHaveTypedReadFlags(t *testing.T) {
+	for _, path := range [][]string{
+		{"watcher", "content"},
+		{"watcher", "space"},
+	} {
+		help := captureHelp(t, path)
+		if !strings.Contains(help, "--limit") {
+			t.Fatalf("%s --help missing --limit:\n%s", strings.Join(path, " "), help)
+		}
+	}
+
+	help := captureHelp(t, []string{"watcher", "status"})
+	for _, want := range []string{"--page", "--space", "--account-id", "--content-type"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("watcher status --help missing %s:\n%s", want, help)
 		}
 	}
 }

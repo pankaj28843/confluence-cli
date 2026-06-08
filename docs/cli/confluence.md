@@ -74,7 +74,7 @@ confluence
 - `template` - Cloud content and blueprint templates
 - `user` - Users (current, view, search)
 - `version` - Print version, build time, and commit
-- `watcher` - Watchers (content, space)
+- `watcher` - Watchers (content, space, status)
 
 ## Options
 

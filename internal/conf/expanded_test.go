@@ -54,7 +54,7 @@ func TestExpandedReadWrite(t *testing.T) {
 			}
 		case strings.HasSuffix(r.URL.Path, "/history"), strings.HasSuffix(r.URL.Path, "/version"):
 			_, _ = w.Write([]byte(`{"history":true}`))
-		case strings.Contains(r.URL.Path, "/notification/child-created"):
+		case strings.Contains(r.URL.Path, "/notification/child-created"), strings.HasSuffix(r.URL.Path, "/watchers"):
 			_, _ = w.Write([]byte(`{"watchers":[]}`))
 		case strings.HasSuffix(r.URL.Path, "/watch"):
 			_, _ = w.Write([]byte(`{"watchers":[]}`))
