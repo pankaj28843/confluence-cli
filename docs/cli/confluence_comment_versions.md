@@ -1,24 +1,24 @@
-# confluence page versions
+# confluence comment versions
 
-List page versions
+List comment versions
 
 ## Synopsis
 
-List version records for one page.
+List version records for one comment.
 
 Cloud uses the documented v2 Version endpoints. Server/Data Center uses the
 documented content version route where the target is content-like.
 
 ## Examples
 
-confluence page versions 12345
-  confluence page versions 12345 --limit 25 --json
-  confluence page versions 12345 --body-format storage --sort -modified-date
+confluence comment versions 12345
+  confluence comment versions 12345 --limit 25 --json
+  confluence comment versions 12345 --body-format storage --sort -modified-date
 
 ## Usage
 
 ```text
-confluence page versions <id> [flags]
+confluence comment versions <id> [flags]
 ```
 
 ## Options
@@ -26,6 +26,7 @@ confluence page versions <id> [flags]
 ```text
       --body-format string   Cloud body representation to include, e.g. storage
       --limit int            Max versions (hard cap 200) (default 25)
+      --location string      Cloud comment location: footer or inline (default "footer")
       --sort string          Cloud sort expression
 ```
 
@@ -41,4 +42,4 @@ confluence page versions <id> [flags]
 
 ## See Also
 
-- [confluence page](confluence_page.md)
+- [confluence comment](confluence_comment.md)

@@ -35,6 +35,7 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"page", "ancestors"},
 		{"page", "history"},
 		{"page", "versions"},
+		{"page", "version"},
 		{"page", "create"},
 		{"page", "update"},
 		{"page", "publish"},
@@ -48,11 +49,15 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"blogpost", "update"},
 		{"blogpost", "delete"},
 		{"blogpost", "purge"},
+		{"blogpost", "versions"},
+		{"blogpost", "version"},
 		{"attachment", "list"},
 		{"attachment", "download"},
 		{"attachment", "upload"},
 		{"attachment", "replace"},
 		{"attachment", "delete"},
+		{"attachment", "versions"},
+		{"attachment", "version"},
 		{"label", "list"},
 		{"label", "space"},
 		{"label", "search"},
@@ -95,6 +100,8 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"comment", "add"},
 		{"comment", "update"},
 		{"comment", "delete"},
+		{"comment", "versions"},
+		{"comment", "version"},
 		{"user", "current"},
 		{"user", "view"},
 		{"user", "search"},
@@ -129,8 +136,14 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"page", "search"},
 		{"page", "direct-children"},
 		{"page", "descendants"},
+		{"page", "versions"},
+		{"page", "version"},
 		{"blogpost", "list"},
+		{"blogpost", "versions"},
+		{"blogpost", "version"},
 		{"attachment", "list"},
+		{"attachment", "versions"},
+		{"attachment", "version"},
 		{"label", "list"},
 		{"label", "space"},
 		{"label", "search"},
@@ -160,6 +173,8 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"comment", "add"},
 		{"comment", "update"},
 		{"comment", "delete"},
+		{"comment", "versions"},
+		{"comment", "version"},
 		{"user", "search"},
 		{"watcher", "content"},
 		{"watcher", "space"},
@@ -392,6 +407,45 @@ func TestContentTreeCommandsHaveTypedReadFlags(t *testing.T) {
 			if !strings.Contains(help, want) {
 				t.Fatalf("%s children --help missing %s:\n%s", group, want, help)
 			}
+		}
+	}
+}
+
+func TestVersionCommandsHaveTypedReadFlags(t *testing.T) {
+	for _, group := range []string{"page", "blogpost"} {
+		help := captureHelp(t, []string{group, "versions"})
+		for _, want := range []string{"--limit", "--sort", "--body-format"} {
+			if !strings.Contains(help, want) {
+				t.Fatalf("%s versions --help missing %s:\n%s", group, want, help)
+			}
+		}
+		if help := captureHelp(t, []string{group, "version"}); !strings.Contains(help, "<number>") {
+			t.Fatalf("%s version --help missing version number usage:\n%s", group, help)
+		}
+	}
+	help := captureHelp(t, []string{"attachment", "versions"})
+	for _, want := range []string{"--limit", "--sort"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("attachment versions --help missing %s:\n%s", want, help)
+		}
+	}
+	if strings.Contains(help, "--body-format") {
+		t.Fatalf("attachment versions --help should not expose undocumented --body-format:\n%s", help)
+	}
+	if help := captureHelp(t, []string{"attachment", "version"}); !strings.Contains(help, "<number>") {
+		t.Fatalf("attachment version --help missing version number usage:\n%s", help)
+	}
+
+	help = captureHelp(t, []string{"comment", "versions"})
+	for _, want := range []string{"--limit", "--sort", "--body-format", "--location"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("comment versions --help missing %s:\n%s", want, help)
+		}
+	}
+	help = captureHelp(t, []string{"comment", "version"})
+	for _, want := range []string{"<number>", "--location"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("comment version --help missing %s:\n%s", want, help)
 		}
 	}
 }

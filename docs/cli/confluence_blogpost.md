@@ -1,6 +1,6 @@
 # confluence blogpost
 
-Blog posts (list, view, create, update, delete, purge)
+Blog posts (list, view, versions, version, create, update, delete, purge)
 
 ## Synopsis
 
@@ -25,6 +25,8 @@ confluence blogpost
 - `list` - List blog posts
 - `purge` - Permanently delete a trashed blog post
 - `update` - Update an existing blog post
+- `version` - Show one blogpost version
+- `versions` - List blogpost versions
 - `view` - Fetch a blog post by id
 
 ## Inherited Options

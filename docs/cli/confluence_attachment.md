@@ -1,6 +1,6 @@
 # confluence attachment
 
-Attachments (list, download, upload, replace, delete)
+Attachments (list, versions, version, download, upload, replace, delete)
 
 ## Synopsis
 
@@ -27,6 +27,8 @@ confluence attachment
 - `list` - List attachments on a page
 - `replace` - Create or replace an attachment on a page
 - `upload` - Upload an attachment to a page
+- `version` - Show one attachment version
+- `versions` - List attachment versions
 
 ## Inherited Options
 

@@ -57,10 +57,10 @@ confluence
 ## Commands
 
 - `api` - Call any Confluence REST endpoint (escape hatch)
-- `attachment` - Attachments (list, download, upload, replace, delete)
-- `blogpost` - Blog posts (list, view, create, update, delete, purge)
+- `attachment` - Attachments (list, versions, version, download, upload, replace, delete)
+- `blogpost` - Blog posts (list, view, versions, version, create, update, delete, purge)
 - `body` - Content body utilities
-- `comment` - Comments (list/add/update/delete)
+- `comment` - Comments (list/versions/version/add/update/delete)
 - `database` - Database reads
 - `docs` - Generate CLI reference documentation
 - `doctor` - Verify environment, auth, and flavor detection
@@ -70,7 +70,7 @@ confluence
 - `like` - Cloud likes (count, users)
 - `macro` - Macro body utilities
 - `operation` - Permitted operations (list)
-- `page` - Pages (view, search, children, direct-children, descendants, ancestors, history, versions, create, update, publish, delete, purge, url, screenshot)
+- `page` - Pages (view, search, children, direct-children, descendants, ancestors, history, versions, version, create, update, publish, delete, purge, url, screenshot)
 - `permission` - Space permission reads
 - `property` - Content and space properties
 - `restriction` - Content restrictions (list)

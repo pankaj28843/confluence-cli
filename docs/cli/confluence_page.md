@@ -1,6 +1,6 @@
 # confluence page
 
-Pages (view, search, children, direct-children, descendants, ancestors, history, versions, create, update, publish, delete, purge, url, screenshot)
+Pages (view, search, children, direct-children, descendants, ancestors, history, versions, version, create, update, publish, delete, purge, url, screenshot)
 
 ## Synopsis
 
@@ -39,7 +39,8 @@ confluence page
 - `search` - CQL-powered page search
 - `update` - Update an existing page (title and/or body)
 - `url` - Print the browser URL for a page
-- `versions` - List version records for a page
+- `version` - Show one page version
+- `versions` - List page versions
 - `view` - Fetch a page (or other content) by id
 
 ## Inherited Options

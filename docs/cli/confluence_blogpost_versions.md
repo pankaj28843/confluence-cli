@@ -1,24 +1,24 @@
-# confluence page versions
+# confluence blogpost versions
 
-List page versions
+List blogpost versions
 
 ## Synopsis
 
-List version records for one page.
+List version records for one blogpost.
 
 Cloud uses the documented v2 Version endpoints. Server/Data Center uses the
 documented content version route where the target is content-like.
 
 ## Examples
 
-confluence page versions 12345
-  confluence page versions 12345 --limit 25 --json
-  confluence page versions 12345 --body-format storage --sort -modified-date
+confluence blogpost versions 12345
+  confluence blogpost versions 12345 --limit 25 --json
+  confluence blogpost versions 12345 --body-format storage --sort -modified-date
 
 ## Usage
 
 ```text
-confluence page versions <id> [flags]
+confluence blogpost versions <id> [flags]
 ```
 
 ## Options
@@ -41,4 +41,4 @@ confluence page versions <id> [flags]
 
 ## See Also
 
-- [confluence page](confluence_page.md)
+- [confluence blogpost](confluence_blogpost.md)

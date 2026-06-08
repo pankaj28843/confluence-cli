@@ -1,6 +1,6 @@
 # confluence comment
 
-Comments (list/add/update/delete)
+Comments (list/versions/version/add/update/delete)
 
 ## Synopsis
 
@@ -27,6 +27,8 @@ confluence comment
 - `delete` - Delete a footer comment
 - `list` - List comments (footer, inline, resolved by default)
 - `update` - Update a footer comment body
+- `version` - Show one comment version
+- `versions` - List comment versions
 
 ## Inherited Options
 

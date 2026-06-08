@@ -11,7 +11,7 @@ import (
 func pageCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "page",
-		Short: "Pages (view, search, children, direct-children, descendants, ancestors, history, versions, create, update, publish, delete, purge, url, screenshot)",
+		Short: "Pages (view, search, children, direct-children, descendants, ancestors, history, versions, version, create, update, publish, delete, purge, url, screenshot)",
 		Long: `Page operations.
 
 Examples:
@@ -33,6 +33,7 @@ Examples:
 	cmd.AddCommand(pageAncestorsCmd())
 	cmd.AddCommand(pageHistoryCmd())
 	cmd.AddCommand(pageVersionsCmd())
+	cmd.AddCommand(pageVersionCmd())
 	cmd.AddCommand(pageCreateCmd())
 	cmd.AddCommand(pageUpdateCmd())
 	cmd.AddCommand(pagePublishCmd())
@@ -473,31 +474,11 @@ Examples:
 }
 
 func pageVersionsCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "versions <id>",
-		Short: "List version records for a page",
-		Long: `List /rest/api/content/{id}/version.
+	return versionListReadCmd("page", "page", true, false)
+}
 
-Examples:
-  confluence page versions 12345 --json`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := newContext()
-			defer cancel()
-			w := getWriter()
-			defer w.Finish()
-			c, err := newClient()
-			if err != nil {
-				return err
-			}
-			data, err := conf.ListVersions(ctx, c, args[0])
-			if err != nil {
-				return err
-			}
-			_, _ = w.Out.Write(data)
-			return nil
-		},
-	}
+func pageVersionCmd() *cobra.Command {
+	return versionDetailReadCmd("page", "page", false)
 }
 
 func buildCQL(space, title string) string {

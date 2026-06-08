@@ -12,7 +12,7 @@ import (
 func attachmentCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "attachment",
-		Short: "Attachments (list, download, upload, replace, delete)",
+		Short: "Attachments (list, versions, version, download, upload, replace, delete)",
 		Long: `Attachment operations.
 
 Examples:
@@ -23,11 +23,21 @@ Examples:
   confluence attachment delete --page 12345 --name old.png --force`,
 	}
 	cmd.AddCommand(attachmentListCmd())
+	cmd.AddCommand(attachmentVersionsCmd())
+	cmd.AddCommand(attachmentVersionCmd())
 	cmd.AddCommand(attachmentDownloadCmd())
 	cmd.AddCommand(attachmentUploadCmd())
 	cmd.AddCommand(attachmentReplaceCmd())
 	cmd.AddCommand(attachmentDeleteCmd())
 	return cmd
+}
+
+func attachmentVersionsCmd() *cobra.Command {
+	return versionListReadCmd("attachment", "attachment", false, false)
+}
+
+func attachmentVersionCmd() *cobra.Command {
+	return versionDetailReadCmd("attachment", "attachment", false)
 }
 
 func attachmentListCmd() *cobra.Command {

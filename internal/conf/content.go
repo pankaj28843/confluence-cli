@@ -391,12 +391,6 @@ func GetHistory(ctx context.Context, c *client.Client, id string) ([]byte, error
 	return data, err
 }
 
-// ListVersions fetches /rest/api/content/{id}/version.
-func ListVersions(ctx context.Context, c *client.Client, id string) ([]byte, error) {
-	data, _, err := c.Get(ctx, "/rest/api/content/"+url.PathEscape(id)+"/version", nil)
-	return data, err
-}
-
 // RenderMarkdown returns the page body converted to Markdown, or the raw
 // storage value if storage rendering is requested.
 func (p *Content) RenderMarkdown(rawStorage bool) string {

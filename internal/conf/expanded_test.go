@@ -106,7 +106,7 @@ func TestExpandedReadWrite(t *testing.T) {
 	if _, err := GetHistory(ctx, c, "12345"); err != nil {
 		t.Fatalf("GetHistory: %v", err)
 	}
-	if _, err := ListVersions(ctx, c, "12345"); err != nil {
+	if _, err := ListVersions(ctx, c, "page", "12345", VersionListOptions{}); err != nil {
 		t.Fatalf("ListVersions: %v", err)
 	}
 	if hs, err := SearchGeneric(ctx, c, "type=space", 5); err != nil || len(hs) != 1 {

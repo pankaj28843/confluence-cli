@@ -1,32 +1,31 @@
-# confluence page versions
+# confluence attachment versions
 
-List page versions
+List attachment versions
 
 ## Synopsis
 
-List version records for one page.
+List version records for one attachment.
 
 Cloud uses the documented v2 Version endpoints. Server/Data Center uses the
 documented content version route where the target is content-like.
 
 ## Examples
 
-confluence page versions 12345
-  confluence page versions 12345 --limit 25 --json
-  confluence page versions 12345 --body-format storage --sort -modified-date
+confluence attachment versions 12345
+  confluence attachment versions 12345 --limit 25 --json
+  confluence attachment versions 12345 --sort -modified-date
 
 ## Usage
 
 ```text
-confluence page versions <id> [flags]
+confluence attachment versions <id> [flags]
 ```
 
 ## Options
 
 ```text
-      --body-format string   Cloud body representation to include, e.g. storage
-      --limit int            Max versions (hard cap 200) (default 25)
-      --sort string          Cloud sort expression
+      --limit int     Max versions (hard cap 200) (default 25)
+      --sort string   Cloud sort expression
 ```
 
 ## Inherited Options
@@ -41,4 +40,4 @@ confluence page versions <id> [flags]
 
 ## See Also
 
-- [confluence page](confluence_page.md)
+- [confluence attachment](confluence_attachment.md)

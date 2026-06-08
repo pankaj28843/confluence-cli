@@ -11,7 +11,7 @@ import (
 func blogpostCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "blogpost",
-		Short: "Blog posts (list, view, create, update, delete, purge)",
+		Short: "Blog posts (list, view, versions, version, create, update, delete, purge)",
 		Long: `Blog post operations.
 
 Examples:
@@ -21,11 +21,21 @@ Examples:
 	}
 	cmd.AddCommand(blogpostListCmd())
 	cmd.AddCommand(blogpostViewCmd())
+	cmd.AddCommand(blogpostVersionsCmd())
+	cmd.AddCommand(blogpostVersionCmd())
 	cmd.AddCommand(blogpostCreateCmd())
 	cmd.AddCommand(blogpostUpdateCmd())
 	cmd.AddCommand(blogpostDeleteCmd())
 	cmd.AddCommand(blogpostPurgeCmd())
 	return cmd
+}
+
+func blogpostVersionsCmd() *cobra.Command {
+	return versionListReadCmd("blogpost", "blogpost", true, false)
+}
+
+func blogpostVersionCmd() *cobra.Command {
+	return versionDetailReadCmd("blogpost", "blogpost", false)
 }
 
 func blogpostListCmd() *cobra.Command {

@@ -12,7 +12,7 @@ import (
 func commentCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "comment",
-		Short: "Comments (list/add/update/delete)",
+		Short: "Comments (list/versions/version/add/update/delete)",
 		Long: `Comment operations.
 
 Examples:
@@ -73,10 +73,20 @@ Examples:
 	list.Flags().StringSliceVar(&locations, "locations", nil, "Subset of footer,inline,resolved")
 	list.Flags().IntVar(&limit, "limit", 100, "Max comments (hard cap 200)")
 	cmd.AddCommand(list)
+	cmd.AddCommand(commentVersionsCmd())
+	cmd.AddCommand(commentVersionCmd())
 	cmd.AddCommand(commentAddCmd())
 	cmd.AddCommand(commentUpdateCmd())
 	cmd.AddCommand(commentDeleteCmd())
 	return cmd
+}
+
+func commentVersionsCmd() *cobra.Command {
+	return versionListReadCmd("comment", "footer-comment", true, true)
+}
+
+func commentVersionCmd() *cobra.Command {
+	return versionDetailReadCmd("comment", "footer-comment", true)
 }
 
 func commentAddCmd() *cobra.Command {
