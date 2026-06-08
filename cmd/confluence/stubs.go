@@ -31,6 +31,8 @@ func likeCmd() *cobra.Command          { return likeCmdReal() }
 func bodyCmd() *cobra.Command          { return bodyCmdReal() }
 func auditCmd() *cobra.Command         { return auditCmdReal() }
 func analyticsCmd() *cobra.Command     { return analyticsCmdReal() }
+func settingsCmd() *cobra.Command      { return settingsCmdReal() }
+func themeCmd() *cobra.Command         { return themeCmdReal() }
 func contentStateCmd() *cobra.Command  { return contentStateCmdReal() }
 func databaseCmd() *cobra.Command      { return databaseCmdReal() }
 func folderCmd() *cobra.Command        { return folderCmdReal() }

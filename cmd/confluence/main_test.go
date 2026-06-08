@@ -88,6 +88,13 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"audit", "retention"},
 		{"analytics", "views"},
 		{"analytics", "viewers"},
+		{"settings", "system-info"},
+		{"settings", "lookandfeel"},
+		{"settings", "space"},
+		{"theme", "list"},
+		{"theme", "global"},
+		{"theme", "view"},
+		{"theme", "space"},
 		{"content-state", "current"},
 		{"content-state", "available"},
 		{"content-state", "custom"},
@@ -187,6 +194,13 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"audit", "retention"},
 		{"analytics", "views"},
 		{"analytics", "viewers"},
+		{"settings", "system-info"},
+		{"settings", "lookandfeel"},
+		{"settings", "space"},
+		{"theme", "list"},
+		{"theme", "global"},
+		{"theme", "view"},
+		{"theme", "space"},
 		{"content-state", "current"},
 		{"content-state", "available"},
 		{"content-state", "custom"},
@@ -508,6 +522,43 @@ func TestAnalyticsCommandsHaveTypedReadFlags(t *testing.T) {
 			if !strings.Contains(help, want) {
 				t.Fatalf("%s --help missing %s:\n%s", strings.Join(path, " "), want, help)
 			}
+		}
+	}
+}
+
+func TestSettingsAndThemeCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"settings", "lookandfeel"})
+	for _, want := range []string{"--space", "Cloud"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("settings lookandfeel --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"settings", "space"})
+	if !strings.Contains(help, "Cloud") {
+		t.Fatalf("settings space --help missing Cloud scope:\n%s", help)
+	}
+
+	help = captureHelp(t, []string{"settings", "system-info"})
+	if !strings.Contains(help, "Cloud") {
+		t.Fatalf("settings system-info --help missing Cloud scope:\n%s", help)
+	}
+
+	help = captureHelp(t, []string{"theme", "list"})
+	for _, want := range []string{"--limit", "--start", "Cloud"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("theme list --help missing %s:\n%s", want, help)
+		}
+	}
+
+	for _, path := range [][]string{
+		{"theme", "global"},
+		{"theme", "view"},
+		{"theme", "space"},
+	} {
+		help = captureHelp(t, path)
+		if !strings.Contains(help, "Cloud") {
+			t.Fatalf("%s --help missing Cloud scope:\n%s", strings.Join(path, " "), help)
 		}
 	}
 }

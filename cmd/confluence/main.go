@@ -83,6 +83,8 @@ Workflow:
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
   confluence audit list --limit 25 --json                    Audit log records
   confluence analytics views 12345 --json                   Cloud content view count
+  confluence settings system-info --json                    Cloud tenant settings
+  confluence theme global --json                            Cloud selected theme
   confluence content-state current 12345                    Cloud content state
   confluence database view 12345 --json                     Cloud database details
   confluence folder children 12345 --json                   Cloud content-tree children
@@ -117,6 +119,8 @@ Workflow:
 	root.AddCommand(bodyCmd())
 	root.AddCommand(auditCmd())
 	root.AddCommand(analyticsCmd())
+	root.AddCommand(settingsCmd())
+	root.AddCommand(themeCmd())
 	root.AddCommand(contentStateCmd())
 	root.AddCommand(databaseCmd())
 	root.AddCommand(folderCmd())

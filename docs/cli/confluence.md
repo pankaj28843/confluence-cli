@@ -42,6 +42,8 @@ confluence doctor                                         Health + auth + flavor
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
   confluence audit list --limit 25 --json                    Audit log records
   confluence analytics views 12345 --json                   Cloud content view count
+  confluence settings system-info --json                    Cloud tenant settings
+  confluence theme global --json                            Cloud selected theme
   confluence content-state current 12345                    Cloud content state
   confluence database view 12345 --json                     Cloud database details
   confluence folder children 12345 --json                   Cloud content-tree children
@@ -83,10 +85,12 @@ confluence
 - `property` - Content and space properties
 - `restriction` - Content restrictions (list)
 - `search` - Search content, spaces, users, attachments, or all
+- `settings` - Cloud settings reads
 - `smart-link` - Smart Link reads
 - `space` - Spaces (list, view)
 - `task` - Tasks (list, view, complete, reopen, long)
 - `template` - Cloud content and blueprint templates
+- `theme` - Cloud theme reads
 - `user` - Users (current, view, search, bulk)
 - `version` - Print version, build time, and commit
 - `watcher` - Watchers (content, space, status)
