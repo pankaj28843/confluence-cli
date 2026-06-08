@@ -10,6 +10,7 @@ List groups.
 
 confluence group list
   confluence group list --json --limit 200
+  confluence group list --access-type admin --json
 
 ## Usage
 
@@ -20,7 +21,8 @@ confluence group list [flags]
 ## Options
 
 ```text
-      --limit int   Max groups (hard cap 200) (default 50)
+      --access-type string   Cloud access type filter: user, admin, or site-admin
+      --limit int            Max groups (hard cap 200) (default 25)
 ```
 
 ## Inherited Options

@@ -1,30 +1,28 @@
-# confluence user view
+# confluence group view
 
-Show a user by username / key / account id
+Show a group
 
 ## Synopsis
 
-Show a user. Pick one selector. On Server/DC use --username or --key;
-on Cloud use --account-id.
+Show a group. On Server/DC pass the group name argument. On Cloud pass --id.
 
 ## Examples
 
-confluence user view --username alice
-  confluence user view --account-id 557058:abc
-  confluence user view --key u1234
+confluence group view engineering
+  confluence group view engineering --expand members
+  confluence group view --id 11111111-2222-3333-4444-555555555555 --json
 
 ## Usage
 
 ```text
-confluence user view [flags]
+confluence group view [name] [flags]
 ```
 
 ## Options
 
 ```text
-      --account-id string   Cloud account id
-      --key string          Server/DC user key
-      --username string     Server/DC username
+      --expand string   Server/DC expand value
+      --id string       Cloud group id
 ```
 
 ## Inherited Options
@@ -39,4 +37,4 @@ confluence user view [flags]
 
 ## See Also
 
-- [confluence user](confluence_user.md)
+- [confluence group](confluence_group.md)

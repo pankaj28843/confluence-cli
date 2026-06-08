@@ -1,6 +1,6 @@
 # confluence group
 
-Groups (list, members)
+Groups (list, view, picker, members, hierarchy)
 
 ## Synopsis
 
@@ -9,6 +9,9 @@ Group operations.
 ## Examples
 
 confluence group list
+  confluence group view engineering
+  confluence group view --id 11111111-2222-3333-4444-555555555555
+  confluence group picker eng
   confluence group members engineering
 
 ## Usage
@@ -19,8 +22,13 @@ confluence group
 
 ## Commands
 
+- `ancestors` - List Server/DC ancestor groups
+- `children` - List Server/DC child groups
 - `list` - List groups
 - `members` - List members of a group
+- `parents` - List Server/DC parent groups
+- `picker` - Search Cloud groups by picker query
+- `view` - Show a group
 
 ## Inherited Options
 

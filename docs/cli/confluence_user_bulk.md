@@ -1,30 +1,26 @@
-# confluence user view
+# confluence user bulk
 
-Show a user by username / key / account id
+Show Cloud users by account id
 
 ## Synopsis
 
-Show a user. Pick one selector. On Server/DC use --username or --key;
-on Cloud use --account-id.
+Show Cloud users by account id using the documented v2 users-bulk endpoint.
 
 ## Examples
 
-confluence user view --username alice
-  confluence user view --account-id 557058:abc
-  confluence user view --key u1234
+confluence user bulk --account-id 557058:abc
+  confluence user bulk --account-id 557058:abc --account-id 557058:def --json
 
 ## Usage
 
 ```text
-confluence user view [flags]
+confluence user bulk [flags]
 ```
 
 ## Options
 
 ```text
-      --account-id string   Cloud account id
-      --key string          Server/DC user key
-      --username string     Server/DC username
+      --account-id strings   Cloud account id; repeatable or comma-separated
 ```
 
 ## Inherited Options

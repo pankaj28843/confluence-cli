@@ -1,6 +1,6 @@
 # confluence user
 
-Users (current, view, search)
+Users (current, view, search, bulk)
 
 ## Synopsis
 
@@ -10,8 +10,9 @@ User operations.
 
 confluence user current
   confluence user view --username alice                  # Server/DC
-  confluence user view --accountId 557058:abc...          # Cloud
+  confluence user view --account-id 557058:abc...         # Cloud
   confluence user search "Jane Smith"
+  confluence user bulk --account-id 557058:abc --json
 
 ## Usage
 
@@ -21,9 +22,10 @@ confluence user
 
 ## Commands
 
+- `bulk` - Show Cloud users by account id
 - `current` - Show the authenticated user
 - `search` - Search users by full name (CQL user.fullname~)
-- `view` - Show a user by username / key / accountId
+- `view` - Show a user by username / key / account id
 
 ## Inherited Options
 

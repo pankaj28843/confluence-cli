@@ -4,23 +4,27 @@ List members of a group
 
 ## Synopsis
 
-List group members.
+List group members. On Server/DC pass the group name argument. On Cloud pass --id.
 
 ## Examples
 
 confluence group members engineering
   confluence group members engineering --json --limit 200
+  confluence group members --id 11111111-2222-3333-4444-555555555555 --expand personalSpace --json
 
 ## Usage
 
 ```text
-confluence group members <name> [flags]
+confluence group members [name] [flags]
 ```
 
 ## Options
 
 ```text
-      --limit int   Max members (hard cap 200) (default 100)
+      --expand strings   Expand value; repeatable or comma-separated
+      --id string        Cloud group id
+      --limit int        Max members (hard cap 200) (default 25)
+      --total-size       Ask Cloud to include total size metadata
 ```
 
 ## Inherited Options

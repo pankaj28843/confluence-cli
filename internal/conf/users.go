@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/pankaj28843/confluence-cli/internal/client"
 )
@@ -56,4 +57,40 @@ func SearchUsers(ctx context.Context, c *client.Client, query string, limit int)
 		return nil, fmt.Errorf("parse user search: %w", err)
 	}
 	return page.Results, nil
+}
+
+// BulkGetUsers fetches Cloud v2 user details for account ids.
+func BulkGetUsers(ctx context.Context, c *client.Client, accountIDs []string) ([]User, error) {
+	if !isCloud(c) {
+		return nil, fmt.Errorf("unsupported Server/Data Center user bulk lookup")
+	}
+	ids := normalizeAccountIDs(accountIDs)
+	if len(ids) == 0 {
+		return nil, fmt.Errorf("at least one account id is required")
+	}
+	body := map[string]any{"accountIds": ids}
+	data, _, err := c.Post(ctx, "/api/v2/users-bulk", nil, body)
+	if err != nil {
+		return nil, err
+	}
+	var page struct {
+		Results []User `json:"results"`
+	}
+	if err := json.Unmarshal(data, &page); err != nil {
+		return nil, fmt.Errorf("parse user bulk: %w", err)
+	}
+	return page.Results, nil
+}
+
+func normalizeAccountIDs(accountIDs []string) []string {
+	out := make([]string, 0, len(accountIDs))
+	for _, raw := range accountIDs {
+		for _, id := range strings.Split(raw, ",") {
+			id = strings.TrimSpace(id)
+			if id != "" {
+				out = append(out, id)
+			}
+		}
+	}
+	return out
 }

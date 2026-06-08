@@ -186,13 +186,19 @@ type SearchHit struct {
 
 // User is a minimised user record used by search hits + user endpoints.
 type User struct {
-	AccountID   string `json:"accountId,omitempty"`
-	UserKey     string `json:"userKey,omitempty"`
-	Username    string `json:"username,omitempty"`
-	DisplayName string `json:"displayName,omitempty"`
-	PublicName  string `json:"publicName,omitempty"`
-	Email       string `json:"email,omitempty"`
-	Type        string `json:"type,omitempty"`
+	AccountID              string         `json:"accountId,omitempty"`
+	UserKey                string         `json:"userKey,omitempty"`
+	Username               string         `json:"username,omitempty"`
+	DisplayName            string         `json:"displayName,omitempty"`
+	PublicName             string         `json:"publicName,omitempty"`
+	Email                  string         `json:"email,omitempty"`
+	Type                   string         `json:"type,omitempty"`
+	TimeZone               string         `json:"timeZone,omitempty"`
+	PersonalSpaceID        string         `json:"personalSpaceId,omitempty"`
+	IsExternalCollaborator bool           `json:"isExternalCollaborator,omitempty"`
+	AccountStatus          string         `json:"accountStatus,omitempty"`
+	AccountType            string         `json:"accountType,omitempty"`
+	ProfilePicture         map[string]any `json:"profilePicture,omitempty"`
 }
 
 // GetChildren returns children of a content id (default type: page).

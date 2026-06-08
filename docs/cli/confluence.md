@@ -67,7 +67,7 @@ confluence
 - `docs` - Generate CLI reference documentation
 - `doctor` - Verify environment, auth, and flavor detection
 - `folder` - Folder reads
-- `group` - Groups (list, members)
+- `group` - Groups (list, view, picker, members, hierarchy)
 - `label` - Content and space labels
 - `like` - Cloud likes (count, users)
 - `macro` - Macro body utilities
@@ -81,7 +81,7 @@ confluence
 - `space` - Spaces (list, view)
 - `task` - Tasks (list, view, complete, reopen, long)
 - `template` - Cloud content and blueprint templates
-- `user` - Users (current, view, search)
+- `user` - Users (current, view, search, bulk)
 - `version` - Print version, build time, and commit
 - `watcher` - Watchers (content, space, status)
 - `whiteboard` - Whiteboard reads

@@ -1,30 +1,27 @@
-# confluence user view
+# confluence group ancestors
 
-Show a user by username / key / account id
+List Server/DC ancestor groups
 
 ## Synopsis
 
-Show a user. Pick one selector. On Server/DC use --username or --key;
-on Cloud use --account-id.
+List Server/DC ancestor groups for a Server/Data Center group.
 
 ## Examples
 
-confluence user view --username alice
-  confluence user view --account-id 557058:abc
-  confluence user view --key u1234
+confluence group ancestors engineering
+  confluence group ancestors engineering --expand members --limit 50 --json
 
 ## Usage
 
 ```text
-confluence user view [flags]
+confluence group ancestors <name> [flags]
 ```
 
 ## Options
 
 ```text
-      --account-id string   Cloud account id
-      --key string          Server/DC user key
-      --username string     Server/DC username
+      --expand string   Server/DC expand value
+      --limit int       Max groups (hard cap 200) (default 25)
 ```
 
 ## Inherited Options
@@ -39,4 +36,4 @@ confluence user view [flags]
 
 ## See Also
 
-- [confluence user](confluence_user.md)
+- [confluence group](confluence_group.md)

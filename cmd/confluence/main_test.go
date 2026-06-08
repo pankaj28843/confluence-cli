@@ -113,8 +113,14 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"user", "current"},
 		{"user", "view"},
 		{"user", "search"},
+		{"user", "bulk"},
 		{"group", "list"},
+		{"group", "view"},
+		{"group", "picker"},
 		{"group", "members"},
+		{"group", "children"},
+		{"group", "parents"},
+		{"group", "ancestors"},
 		{"watcher", "content"},
 		{"watcher", "space"},
 		{"watcher", "status"},
@@ -191,7 +197,15 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"comment", "delete"},
 		{"comment", "versions"},
 		{"comment", "version"},
+		{"user", "bulk"},
 		{"user", "search"},
+		{"group", "list"},
+		{"group", "view"},
+		{"group", "picker"},
+		{"group", "members"},
+		{"group", "children"},
+		{"group", "parents"},
+		{"group", "ancestors"},
 		{"watcher", "content"},
 		{"watcher", "space"},
 		{"watcher", "status"},
@@ -354,6 +368,63 @@ func TestWatcherCommandsHaveTypedReadFlags(t *testing.T) {
 	for _, want := range []string{"--page", "--space", "--account-id", "--content-type"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("watcher status --help missing %s:\n%s", want, help)
+		}
+	}
+}
+
+func TestUserAndGroupCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"user", "view"})
+	for _, want := range []string{"--username", "--key", "--account-id"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("user view --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"user", "bulk"})
+	for _, want := range []string{"--account-id"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("user bulk --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"group", "list"})
+	for _, want := range []string{"--limit", "--access-type"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("group list --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"group", "view"})
+	for _, want := range []string{"--id", "--expand"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("group view --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"group", "members"})
+	for _, want := range []string{"--id", "--limit", "--expand", "--total-size"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("group members --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"group", "picker"})
+	for _, want := range []string{"--limit", "--total-size"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("group picker --help missing %s:\n%s", want, help)
+		}
+	}
+
+	for _, path := range [][]string{
+		{"group", "children"},
+		{"group", "parents"},
+		{"group", "ancestors"},
+	} {
+		help = captureHelp(t, path)
+		for _, want := range []string{"--limit", "--expand"} {
+			if !strings.Contains(help, want) {
+				t.Fatalf("%s --help missing %s:\n%s", strings.Join(path, " "), want, help)
+			}
 		}
 	}
 }
