@@ -37,6 +37,13 @@ func CreatePage(ctx context.Context, c *client.Client, in CreatePageInput) (*Con
 	if in.Type == "" {
 		in.Type = "page"
 	}
+	if shouldUseCloudPageV2(c, in.Type, in.BodyFormat) {
+		return createPageCloudV2(ctx, c, in)
+	}
+	return createPageServerV1(ctx, c, in)
+}
+
+func createPageServerV1(ctx context.Context, c *client.Client, in CreatePageInput) (*Content, error) {
 	body := map[string]any{
 		"type":  in.Type,
 		"title": in.Title,
@@ -62,6 +69,41 @@ func CreatePage(ctx context.Context, c *client.Client, in CreatePageInput) (*Con
 	return &out, nil
 }
 
+func createPageCloudV2(ctx context.Context, c *client.Client, in CreatePageInput) (*Content, error) {
+	space, err := getCloudSpaceV2(ctx, c, in.SpaceKey)
+	if err != nil {
+		return nil, err
+	}
+	if space.ID == "" {
+		return nil, fmt.Errorf("CreatePage: cloud space %q has no id", in.SpaceKey)
+	}
+
+	body := map[string]any{
+		"spaceId": space.ID,
+		"status":  "current",
+		"title":   in.Title,
+		"body": map[string]any{
+			"representation": in.BodyFormat,
+			"value":          in.BodyValue,
+		},
+		"subtype": "live",
+	}
+	if in.ParentID != "" {
+		body["parentId"] = in.ParentID
+	}
+
+	data, _, err := c.Post(ctx, "/api/v2/pages", nil, body)
+	if err != nil {
+		return nil, err
+	}
+	out, err := parseContentResponse(data, "create")
+	if err != nil {
+		return nil, err
+	}
+	normalizeCloudPage(out, space.Key)
+	return out, nil
+}
+
 // UpdatePageInput collects fields for a PUT /rest/api/content/{id}.
 type UpdatePageInput struct {
 	ID            string
@@ -83,6 +125,13 @@ func UpdatePage(ctx context.Context, c *client.Client, in UpdatePageInput) (*Con
 	if in.Type == "" {
 		in.Type = "page"
 	}
+	if shouldUseCloudPageV2(c, in.Type, in.BodyFormat) && in.Title != "" && in.BodyValue != "" {
+		return updatePageCloudV2(ctx, c, in)
+	}
+	return updatePageServerV1(ctx, c, in)
+}
+
+func updatePageServerV1(ctx context.Context, c *client.Client, in UpdatePageInput) (*Content, error) {
 	body := map[string]any{
 		"version": map[string]any{"number": in.VersionNumber + 1},
 		"type":    in.Type,
@@ -109,12 +158,92 @@ func UpdatePage(ctx context.Context, c *client.Client, in UpdatePageInput) (*Con
 	return &out, nil
 }
 
+func updatePageCloudV2(ctx context.Context, c *client.Client, in UpdatePageInput) (*Content, error) {
+	body := map[string]any{
+		"id":     in.ID,
+		"status": "current",
+		"title":  in.Title,
+		"version": map[string]any{
+			"number": in.VersionNumber + 1,
+		},
+		"body": map[string]any{
+			"representation": in.BodyFormat,
+			"value":          in.BodyValue,
+		},
+	}
+
+	raw, _, err := c.Put(ctx, "/api/v2/pages/"+url.PathEscape(in.ID), nil, body)
+	if err != nil {
+		return nil, err
+	}
+	out, err := parseContentResponse(raw, "update")
+	if err != nil {
+		return nil, err
+	}
+	normalizeCloudPage(out, "")
+	return out, nil
+}
+
+func shouldUseCloudPageV2(c *client.Client, contentType, bodyFormat string) bool {
+	return isCloud(c) && contentType == "page" && bodyFormat == "storage"
+}
+
+func parseContentResponse(data []byte, verb string) (*Content, error) {
+	var out Content
+	if err := json.Unmarshal(data, &out); err != nil {
+		return nil, fmt.Errorf("parse %s response: %w", verb, err)
+	}
+	return &out, nil
+}
+
+func normalizeCloudPage(out *Content, spaceKey string) {
+	if out.Type == "" {
+		out.Type = "page"
+	}
+	if out.Space.Key == "" {
+		out.Space.Key = spaceKey
+	}
+}
+
 // DeleteContent deletes any Confluence content entity, including attachments.
 func DeleteContent(ctx context.Context, c *client.Client, id string) error {
 	if id == "" {
 		return fmt.Errorf("DeleteContent: ID is required")
 	}
 	_, _, err := c.Delete(ctx, "/rest/api/content/"+url.PathEscape(id), nil)
+	return err
+}
+
+// PageDeleteOptions controls page trash/delete behavior.
+type PageDeleteOptions struct {
+	Purge bool
+	Draft bool
+}
+
+// DeletePage trashes or purges a page using the flavor-appropriate endpoint.
+func DeletePage(ctx context.Context, c *client.Client, id string, opts PageDeleteOptions) error {
+	if id == "" {
+		return fmt.Errorf("DeletePage: ID is required")
+	}
+	if isCloud(c) {
+		params := url.Values{}
+		if opts.Purge {
+			params.Set("purge", "true")
+		}
+		if opts.Draft {
+			params.Set("draft", "true")
+		}
+		_, _, err := c.Delete(ctx, "/api/v2/pages/"+url.PathEscape(id), params)
+		return err
+	}
+	if opts.Draft {
+		return fmt.Errorf("DeletePage: draft deletion is only supported on Confluence Cloud")
+	}
+	params := url.Values{}
+	if opts.Purge {
+		params.Set("status", "trashed")
+	}
+	_, _, err := c.Delete(ctx, "/rest/api/content/"+url.PathEscape(id), params)
 	return err
 }
 

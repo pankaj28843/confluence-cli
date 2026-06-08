@@ -120,7 +120,7 @@ Examples:
 			if match == nil {
 				return fmt.Errorf("no attachment named %q on page %s", name, page)
 			}
-			data, err := conf.DownloadAttachment(ctx, c, match.Links.Download)
+			data, err := conf.DownloadAttachment(ctx, c, page, *match)
 			if err != nil {
 				return err
 			}

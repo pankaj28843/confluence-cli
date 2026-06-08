@@ -117,7 +117,7 @@ func TestExpandedReadWrite(t *testing.T) {
 	if as, err := ListAttachments(ctx, c, "12345", 10); err != nil || len(as) != 1 {
 		t.Fatalf("ListAttachments: %v %+v", err, as)
 	}
-	if ls, err := ListLabels(ctx, c, "12345"); err != nil || len(ls) != 1 {
+	if ls, err := ListLabels(ctx, c, "12345", 25); err != nil || len(ls) != 1 {
 		t.Fatalf("ListLabels: %v %+v", err, ls)
 	}
 	if ls, err := AddLabels(ctx, c, "12345", []string{"shipped"}); err != nil || ls[0].Name != "shipped" {

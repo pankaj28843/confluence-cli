@@ -83,8 +83,8 @@ func (c *Client) authHeader() string {
 }
 
 // BuildURL joins the base URL with the supplied path. Path should start with '/'.
-// Callers use /rest/api/... or /wiki/api/v2/... directly — the client does not
-// inject prefixes.
+// Callers use /rest/api/... or /api/v2/... directly. For Cloud, BaseURL already
+// includes /wiki, so the client does not inject or duplicate that prefix.
 func (c *Client) BuildURL(path string, params url.Values) string {
 	u := strings.TrimRight(c.BaseURL, "/") + path
 	if len(params) > 0 {

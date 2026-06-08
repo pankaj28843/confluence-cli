@@ -36,6 +36,13 @@ type SpaceFilter struct {
 
 // ListSpaces pages /rest/api/space. Follows _links.next until limit is reached.
 func ListSpaces(ctx context.Context, c *client.Client, f SpaceFilter) ([]Space, error) {
+	if isCloud(c) {
+		return listSpacesCloudV2(ctx, c, f)
+	}
+	return listSpacesServerV1(ctx, c, f)
+}
+
+func listSpacesServerV1(ctx context.Context, c *client.Client, f SpaceFilter) ([]Space, error) {
 	if f.Limit <= 0 {
 		f.Limit = 25
 	}
@@ -85,6 +92,13 @@ func ListSpaces(ctx context.Context, c *client.Client, f SpaceFilter) ([]Space, 
 
 // GetSpace fetches /rest/api/space/{key}.
 func GetSpace(ctx context.Context, c *client.Client, key string) (*Space, error) {
+	if isCloud(c) {
+		return getSpaceCloudV2(ctx, c, key)
+	}
+	return getSpaceServerV1(ctx, c, key)
+}
+
+func getSpaceServerV1(ctx context.Context, c *client.Client, key string) (*Space, error) {
 	data, _, err := c.Get(ctx, "/rest/api/space/"+url.PathEscape(key), url.Values{"expand": {"description.plain,homepage"}})
 	if err != nil {
 		return nil, err

@@ -11,28 +11,129 @@ import (
 func pageCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "page",
-		Short: "Pages (view, search, children, ancestors, history, versions, create, update, publish, url, screenshot)",
+		Short: "Pages (view, search, children, direct-children, descendants, ancestors, history, versions, create, update, publish, delete, purge, url, screenshot)",
 		Long: `Page operations.
 
 Examples:
   confluence page view 12345 --markdown
   confluence page search --cql "type=page AND space=ENG"
   confluence page children 12345 --recursive
+  confluence page direct-children 12345 --json
+  confluence page descendants 12345 --depth 2
   confluence page create --space ENG --title "Runbook" --body-file body.html
+  confluence page delete 12345 --force
   confluence page url 12345
   confluence page screenshot 12345 --out verify.png`,
 	}
 	cmd.AddCommand(pageViewCmd())
 	cmd.AddCommand(pageSearchCmd())
 	cmd.AddCommand(pageChildrenCmd())
+	cmd.AddCommand(pageDirectChildrenCmd())
+	cmd.AddCommand(pageDescendantsCmd())
 	cmd.AddCommand(pageAncestorsCmd())
 	cmd.AddCommand(pageHistoryCmd())
 	cmd.AddCommand(pageVersionsCmd())
 	cmd.AddCommand(pageCreateCmd())
 	cmd.AddCommand(pageUpdateCmd())
 	cmd.AddCommand(pagePublishCmd())
+	cmd.AddCommand(pageDeleteCmd())
+	cmd.AddCommand(pagePurgeCmd())
 	cmd.AddCommand(pageURLCmd())
 	cmd.AddCommand(pageScreenshotCmd())
+	return cmd
+}
+
+func pageDirectChildrenCmd() *cobra.Command {
+	var limit int
+	var types []string
+	cmd := &cobra.Command{
+		Use:   "direct-children <id>",
+		Short: "List direct mixed children of a page",
+		Long: `List direct mixed content-tree children under a page or content id.
+
+Cloud returns page, database, embed, folder, and whiteboard children through the
+v2 direct-children route. Server/Data Center returns expanded direct child
+content types through the documented child content route.
+
+Examples:
+  confluence page direct-children 12345
+  confluence page direct-children 12345 --type page --type database --json
+  confluence page direct-children 12345 --type page,comment --limit 100`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := newContext()
+			defer cancel()
+			w := getWriter()
+			defer w.Finish()
+			c, err := newClient()
+			if err != nil {
+				return err
+			}
+			children, err := conf.ListDirectChildren(ctx, c, args[0], conf.DirectChildrenOptions{
+				Limit: limit,
+				Types: types,
+			})
+			if err != nil {
+				return err
+			}
+			if w.IsJSON() {
+				return w.JSON(children)
+			}
+			for _, child := range children {
+				position := "-"
+				if child.ChildPosition > 0 {
+					position = fmt.Sprintf("%d", child.ChildPosition)
+				}
+				w.Text("%s\t%s\tpos=%s\t%s\n", child.ID, child.Type, position, child.Title)
+			}
+			return nil
+		},
+	}
+	cmd.Flags().IntVar(&limit, "limit", 50, "Max children (hard cap 200)")
+	cmd.Flags().StringSliceVar(&types, "type", nil, "Content type filter; repeatable or comma-separated")
+	return cmd
+}
+
+func pageDescendantsCmd() *cobra.Command {
+	var limit, depth int
+	cmd := &cobra.Command{
+		Use:   "descendants <id>",
+		Short: "List descendant pages/content under a page",
+		Long: `List descendants under a page. Cloud uses the v2 descendants endpoint.
+Server/Data Center walks documented child page routes recursively.
+
+Examples:
+  confluence page descendants 12345
+  confluence page descendants 12345 --depth 2 --limit 100
+  confluence page descendants 12345 --json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := newContext()
+			defer cancel()
+			w := getWriter()
+			defer w.Finish()
+			c, err := newClient()
+			if err != nil {
+				return err
+			}
+			descendants, err := conf.ListPageDescendants(ctx, c, args[0], conf.PageDescendantsOptions{
+				Limit: limit,
+				Depth: depth,
+			})
+			if err != nil {
+				return err
+			}
+			if w.IsJSON() {
+				return w.JSON(descendants)
+			}
+			for _, d := range descendants {
+				w.Text("%s\t%s\tdepth=%d\t%s\n", d.ID, d.Type, d.Depth, d.Title)
+			}
+			return nil
+		},
+	}
+	cmd.Flags().IntVar(&limit, "limit", 50, "Max descendants (hard cap 200)")
+	cmd.Flags().IntVar(&depth, "depth", 0, "Max descendant depth; 0 means no explicit cap")
 	return cmd
 }
 

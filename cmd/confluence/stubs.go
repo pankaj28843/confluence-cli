@@ -21,8 +21,16 @@ func notImplemented(what string) error {
 // Live groups (edit entries here to point at the real cmd):
 func spaceCmd() *cobra.Command       { return spaceCmdReal() }
 func pageCmd() *cobra.Command        { return pageCmdReal() }
+func blogpostCmd() *cobra.Command    { return blogpostCmdReal() }
 func attachmentCmd() *cobra.Command  { return attachmentCmdReal() }
 func labelCmd() *cobra.Command       { return labelCmdReal() }
+func propertyCmd() *cobra.Command    { return propertyCmdReal() }
+func taskCmd() *cobra.Command        { return taskCmdReal() }
+func operationCmd() *cobra.Command   { return operationCmdReal() }
+func likeCmd() *cobra.Command        { return likeCmdReal() }
+func bodyCmd() *cobra.Command        { return bodyCmdReal() }
+func macroCmd() *cobra.Command       { return macroCmdReal() }
+func templateCmd() *cobra.Command    { return templateCmdReal() }
 func commentCmd() *cobra.Command     { return commentCmdReal() }
 func userCmd() *cobra.Command        { return userCmdReal() }
 func groupCmd() *cobra.Command       { return groupCmdReal() }

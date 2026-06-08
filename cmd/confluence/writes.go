@@ -221,6 +221,91 @@ Examples:
 	return cmd
 }
 
+func pageDeleteCmd() *cobra.Command {
+	var force, draft bool
+	cmd := &cobra.Command{
+		Use:   "delete <id>",
+		Short: "Move a page to trash",
+		Long: `Move a page to trash. On Cloud, --draft deletes a draft page; discarded
+drafts are permanently deleted by Confluence and are not sent to trash.
+
+Examples:
+  confluence page delete 12345
+  confluence page delete 12345 --force
+  confluence page delete 12345 --draft --force --json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := newContext()
+			defer cancel()
+			w := getWriter()
+			defer w.Finish()
+
+			if !force && !confirmDelete(args[0], "page") {
+				return fmt.Errorf("delete cancelled")
+			}
+			c, err := newClient()
+			if err != nil {
+				return err
+			}
+			if err := conf.DeletePage(ctx, c, args[0], conf.PageDeleteOptions{Draft: draft}); err != nil {
+				return err
+			}
+			if w.IsJSON() {
+				return w.JSON(map[string]any{"deleted": true, "id": args[0], "draft": draft})
+			}
+			if draft {
+				w.Text("deleted draft page %s\n", args[0])
+				return nil
+			}
+			w.Text("moved page %s to trash\n", args[0])
+			return nil
+		},
+	}
+	cmd.Flags().BoolVar(&force, "force", false, "Do not prompt for confirmation")
+	cmd.Flags().BoolVar(&draft, "draft", false, "Cloud only: delete a draft page")
+	return cmd
+}
+
+func pagePurgeCmd() *cobra.Command {
+	var force bool
+	cmd := &cobra.Command{
+		Use:   "purge <id>",
+		Short: "Permanently delete a trashed page",
+		Long: `Permanently delete a trashed page. Cloud requires the page to already be in
+trash. Server/Data Center sends status=trashed to purge trashable content.
+
+Examples:
+  confluence page purge 12345
+  confluence page purge 12345 --force
+  confluence page purge 12345 --force --json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := newContext()
+			defer cancel()
+			w := getWriter()
+			defer w.Finish()
+
+			if !force && !confirmDelete(args[0], "page") {
+				return fmt.Errorf("delete cancelled")
+			}
+			c, err := newClient()
+			if err != nil {
+				return err
+			}
+			if err := conf.DeletePage(ctx, c, args[0], conf.PageDeleteOptions{Purge: true}); err != nil {
+				return err
+			}
+			if w.IsJSON() {
+				return w.JSON(map[string]any{"purged": true, "id": args[0]})
+			}
+			w.Text("purged page %s\n", args[0])
+			return nil
+		},
+	}
+	cmd.Flags().BoolVar(&force, "force", false, "Do not prompt for confirmation")
+	return cmd
+}
+
 func attachmentUploadCmd() *cobra.Command { return attachmentPutCmd("upload") }
 
 func attachmentReplaceCmd() *cobra.Command { return attachmentPutCmd("replace") }
@@ -412,9 +497,16 @@ func attachmentReader(file, fileName string) (io.Reader, string, func(), error) 
 }
 
 func confirmDelete(id, title string) bool {
-	fmt.Fprintf(os.Stderr, "Delete attachment %s", id)
-	if title != "" {
-		fmt.Fprintf(os.Stderr, " (%s)", title)
+	entity := "attachment"
+	detail := title
+	switch title {
+	case "page", "blogpost", "comment":
+		entity = title
+		detail = ""
+	}
+	fmt.Fprintf(os.Stderr, "Delete %s %s", entity, id)
+	if detail != "" {
+		fmt.Fprintf(os.Stderr, " (%s)", detail)
 	}
 	fmt.Fprint(os.Stderr, "? Type 'delete' to confirm: ")
 	line, err := bufio.NewReader(os.Stdin).ReadString('\n')

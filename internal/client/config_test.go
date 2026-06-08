@@ -5,7 +5,23 @@ import (
 	"testing"
 )
 
+func resetConfluenceEnv(t *testing.T) {
+	t.Helper()
+	for _, k := range []string{
+		"CONFLUENCE_URL",
+		"CONFLUENCE_FLAVOR",
+		"CONFLUENCE_PAT",
+		"CONFLUENCE_PERSONAL_ACCESS_TOKEN",
+		"CONFLUENCE_EMAIL",
+		"CONFLUENCE_API_TOKEN",
+		"CONFLUENCE_DEFAULT_SPACE",
+	} {
+		t.Setenv(k, "")
+	}
+}
+
 func TestFromEnvMissingURL(t *testing.T) {
+	resetConfluenceEnv(t)
 	t.Setenv("CONFLUENCE_URL", "")
 	t.Setenv("CONFLUENCE_PAT", "x")
 	if _, err := FromEnv(); !errors.Is(err, ErrMissingURL) {
@@ -14,7 +30,9 @@ func TestFromEnvMissingURL(t *testing.T) {
 }
 
 func TestFromEnvServerMissingPAT(t *testing.T) {
+	resetConfluenceEnv(t)
 	t.Setenv("CONFLUENCE_URL", "https://wiki.example.com")
+	t.Setenv("CONFLUENCE_FLAVOR", "server")
 	t.Setenv("CONFLUENCE_PAT", "")
 	t.Setenv("CONFLUENCE_PERSONAL_ACCESS_TOKEN", "")
 	if _, err := FromEnv(); !errors.Is(err, ErrMissingServerAuth) {
@@ -23,7 +41,9 @@ func TestFromEnvServerMissingPAT(t *testing.T) {
 }
 
 func TestFromEnvCloudMissingAuth(t *testing.T) {
+	resetConfluenceEnv(t)
 	t.Setenv("CONFLUENCE_URL", "https://example.atlassian.net/wiki")
+	t.Setenv("CONFLUENCE_FLAVOR", "cloud")
 	t.Setenv("CONFLUENCE_EMAIL", "")
 	t.Setenv("CONFLUENCE_API_TOKEN", "")
 	if _, err := FromEnv(); !errors.Is(err, ErrMissingCloudAuth) {
@@ -32,7 +52,9 @@ func TestFromEnvCloudMissingAuth(t *testing.T) {
 }
 
 func TestFromEnvPATAlias(t *testing.T) {
+	resetConfluenceEnv(t)
 	t.Setenv("CONFLUENCE_URL", "https://wiki.example.com")
+	t.Setenv("CONFLUENCE_FLAVOR", "server")
 	t.Setenv("CONFLUENCE_PAT", "")
 	t.Setenv("CONFLUENCE_PERSONAL_ACCESS_TOKEN", "alias-pat")
 	cfg, err := FromEnv()
@@ -45,6 +67,7 @@ func TestFromEnvPATAlias(t *testing.T) {
 }
 
 func TestFromEnvFlavorOverride(t *testing.T) {
+	resetConfluenceEnv(t)
 	t.Setenv("CONFLUENCE_URL", "https://wiki.example.com")
 	t.Setenv("CONFLUENCE_FLAVOR", "cloud")
 	t.Setenv("CONFLUENCE_EMAIL", "e@example.com")

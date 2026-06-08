@@ -27,13 +27,15 @@ Examples:
 
 func labelListCmd() *cobra.Command {
 	var page string
+	var limit int
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List labels on a content id",
 		Long: `List labels.
 
 Examples:
-  confluence label list --page 12345 --json`,
+  confluence label list --page 12345 --json
+  confluence label list --page 12345 --limit 100`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := newContext()
@@ -47,7 +49,7 @@ Examples:
 			if err != nil {
 				return err
 			}
-			labels, err := conf.ListLabels(ctx, c, page)
+			labels, err := conf.ListLabels(ctx, c, page, limit)
 			if err != nil {
 				return err
 			}
@@ -61,6 +63,7 @@ Examples:
 		},
 	}
 	cmd.Flags().StringVar(&page, "page", "", "Content id (required)")
+	cmd.Flags().IntVar(&limit, "limit", 25, "Max labels (hard cap 200)")
 	return cmd
 }
 

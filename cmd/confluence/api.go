@@ -21,8 +21,9 @@ func apiCmdReal() *cobra.Command {
 		Use:   "api <path>",
 		Short: "Call any Confluence REST endpoint (escape hatch)",
 		Long: `Issue a raw REST call to Confluence. Auto-routes by path — start your
-path with /rest/api/... for v1 or /wiki/api/v2/... for Cloud v2. The path is
-appended to CONFLUENCE_URL verbatim (the client does NOT inject /wiki).
+path with /rest/api/... for v1 or /api/v2/... for Cloud v2. The path is
+appended to CONFLUENCE_URL verbatim. For Cloud, CONFLUENCE_URL already ends in
+/wiki, so do not add another /wiki prefix in the path.
 
 Body:
   --data '@file.json'    reads from disk
@@ -36,7 +37,7 @@ Examples:
   confluence api /rest/api/user/current
   confluence api /rest/api/space --param 'limit=10' --jq '.results[].key'
   confluence api /rest/api/content/search --param 'cql=type=page' --param 'limit=5'
-  confluence api /wiki/api/v2/spaces --param 'limit=5'         # Cloud v2
+  confluence api /api/v2/spaces --param 'limit=5'              # Cloud v2
   echo '{"foo":"bar"}' | confluence api /rest/api/some-write -X POST --data '@-'`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -12,20 +12,27 @@ func restrictionCmdReal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "restriction",
 		Short: "Content restrictions (list)",
-		Long: `Restriction operations. Output is passed through verbatim — ACE shape is
-Confluence-version specific.
+		Long: `Content restriction helpers.
+
+List restrictions grouped by operation, or inspect the read/update restrictions
+for one content id.
 
 Examples:
-  confluence restriction list --page 12345 --json`,
+  confluence restriction list --page 12345
+  confluence restriction list --page 12345 --operation read --json`,
 	}
 	var page string
+	var operation string
+	var limit int
 	list := &cobra.Command{
 		Use:   "list",
 		Short: "List read/update restrictions on a content id",
-		Long: `List restrictions.
+		Long: `List read/update restrictions on a content id.
 
 Examples:
-  confluence restriction list --page 12345 --json`,
+  confluence restriction list --page 12345
+  confluence restriction list --page 12345 --operation read
+  confluence restriction list --page 12345 --operation update --json`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := newContext()
@@ -39,15 +46,33 @@ Examples:
 			if err != nil {
 				return err
 			}
-			data, err := conf.GetContentRestrictions(ctx, c, page)
+			if operation != "" {
+				restriction, err := conf.GetContentRestrictionForOperation(ctx, c, page, operation, limit)
+				if err != nil {
+					return err
+				}
+				if w.IsJSON() {
+					return w.JSON(restriction)
+				}
+				w.Text("%s\tusers=%d\tgroups=%d\n", restriction.Operation, restriction.UserCount(), restriction.GroupCount())
+				return nil
+			}
+			resp, err := conf.ListContentRestrictions(ctx, c, page)
 			if err != nil {
 				return err
 			}
-			_, _ = w.Out.Write(data)
+			if w.IsJSON() {
+				return w.JSON(resp)
+			}
+			for _, restriction := range resp.Operations() {
+				w.Text("%s\tusers=%d\tgroups=%d\n", restriction.Operation, restriction.UserCount(), restriction.GroupCount())
+			}
 			return nil
 		},
 	}
 	list.Flags().StringVar(&page, "page", "", "Content id (required)")
+	list.Flags().StringVar(&operation, "operation", "", "Restriction operation: read or update")
+	list.Flags().IntVar(&limit, "limit", 25, "Maximum users/groups returned for --operation")
 	cmd.AddCommand(list)
 	return cmd
 }

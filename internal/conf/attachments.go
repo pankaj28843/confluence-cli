@@ -37,6 +37,13 @@ type Attachment struct {
 
 // ListAttachments pages /rest/api/content/{id}/child/attachment.
 func ListAttachments(ctx context.Context, c *client.Client, contentID string, limit int) ([]Attachment, error) {
+	if isCloud(c) {
+		return listAttachmentsCloudV2(ctx, c, contentID, limit)
+	}
+	return listAttachmentsServerV1(ctx, c, contentID, limit)
+}
+
+func listAttachmentsServerV1(ctx context.Context, c *client.Client, contentID string, limit int) ([]Attachment, error) {
 	if limit <= 0 {
 		limit = 50
 	}
@@ -65,11 +72,22 @@ func (a *Attachment) DownloadURL() string {
 	return a.Links.Base + a.Links.Download
 }
 
-// DownloadAttachment fetches the raw bytes of an attachment via its download
-// link. Server/DC and Cloud both serve this on the same Authorization.
-func DownloadAttachment(ctx context.Context, c *client.Client, downloadPath string) ([]byte, error) {
+// DownloadAttachment fetches raw attachment bytes. Server/DC uses the returned
+// download link. Cloud v2 returns a browser-facing downloadLink, so Cloud uses
+// the v1 raw-content route that accepts Basic email:token auth.
+func DownloadAttachment(ctx context.Context, c *client.Client, contentID string, attachment Attachment) ([]byte, error) {
+	downloadPath := attachment.Links.Download
+	if isCloud(c) {
+		if contentID == "" {
+			return nil, fmt.Errorf("DownloadAttachment: content ID is required")
+		}
+		if attachment.ID == "" {
+			return nil, fmt.Errorf("DownloadAttachment: attachment ID is required")
+		}
+		downloadPath = "/rest/api/content/" + url.PathEscape(contentID) + "/child/attachment/" + url.PathEscape(attachment.ID) + "/download"
+	}
 	if downloadPath == "" {
-		return nil, fmt.Errorf("empty download path")
+		return nil, fmt.Errorf("DownloadAttachment: download path is required")
 	}
 	data, _, err := c.Get(ctx, downloadPath, nil)
 	return data, err

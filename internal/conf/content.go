@@ -14,11 +14,15 @@ import (
 // Content is the minimised /rest/api/content{/:id,/search} shape. Handles pages,
 // blogposts, comments, and attachments.
 type Content struct {
-	ID     string `json:"id"`
-	Type   string `json:"type,omitempty"` // page | blogpost | comment | attachment
-	Status string `json:"status,omitempty"`
-	Title  string `json:"title,omitempty"`
-	Space  struct {
+	ID            string `json:"id"`
+	Type          string `json:"type,omitempty"` // page | blogpost | comment | attachment
+	Status        string `json:"status,omitempty"`
+	Title         string `json:"title,omitempty"`
+	ParentID      string `json:"parentId,omitempty"`
+	SpaceID       string `json:"spaceId,omitempty"`
+	Depth         int    `json:"depth,omitempty"`
+	ChildPosition int    `json:"childPosition,omitempty"`
+	Space         struct {
 		Key  string `json:"key,omitempty"`
 		Name string `json:"name,omitempty"`
 	} `json:"space,omitempty"`
@@ -53,6 +57,18 @@ type Content struct {
 		Self  string `json:"self,omitempty"`
 	} `json:"_links,omitempty"`
 	Excerpt string `json:"excerpt,omitempty"`
+}
+
+// PageDescendantsOptions controls page descendant traversal.
+type PageDescendantsOptions struct {
+	Limit int
+	Depth int
+}
+
+// DirectChildrenOptions controls direct child listing for mixed content-tree children.
+type DirectChildrenOptions struct {
+	Limit int
+	Types []string
 }
 
 // Label is a content label.
@@ -164,8 +180,9 @@ func GetChildren(ctx context.Context, c *client.Client, id, childType string, li
 	if childType == "" {
 		childType = "page"
 	}
-	if limit <= 0 {
-		limit = 50
+	limit = clampLimit(limit)
+	if isCloud(c) && childType == "page" {
+		return ListDirectChildren(ctx, c, id, DirectChildrenOptions{Limit: limit, Types: []string{"page"}})
 	}
 	params := url.Values{
 		"limit":  {strconv.Itoa(limit)},
@@ -183,6 +200,213 @@ func GetChildren(ctx context.Context, c *client.Client, id, childType string, li
 		return nil, fmt.Errorf("parse children: %w", err)
 	}
 	return page.Results, nil
+}
+
+// ListDirectChildren returns immediate mixed content-tree children under a page
+// or content id. Cloud uses the v2 direct-children route; Server/DC uses the
+// documented child content route with expanded child types.
+func ListDirectChildren(ctx context.Context, c *client.Client, id string, opts DirectChildrenOptions) ([]Content, error) {
+	if id == "" {
+		return nil, fmt.Errorf("ListDirectChildren: ID is required")
+	}
+	opts.Limit = clampLimit(opts.Limit)
+	opts.Types = normalizeContentTypes(opts.Types)
+	if isCloud(c) {
+		return listDirectChildrenCloudV2(ctx, c, id, opts)
+	}
+	return listDirectChildrenServerV1(ctx, c, id, opts)
+}
+
+func listDirectChildrenCloudV2(ctx context.Context, c *client.Client, id string, opts DirectChildrenOptions) ([]Content, error) {
+	path := "/api/v2/pages/" + url.PathEscape(id) + "/direct-children"
+	params := url.Values{"limit": {strconv.Itoa(opts.Limit)}}
+	out := make([]Content, 0, opts.Limit)
+	for len(out) < opts.Limit {
+		data, headers, err := c.Get(ctx, path, params)
+		if err != nil {
+			return nil, err
+		}
+		var page struct {
+			Results []Content `json:"results"`
+			Links   struct {
+				Next string `json:"next,omitempty"`
+			} `json:"_links"`
+		}
+		if err := json.Unmarshal(data, &page); err != nil {
+			return nil, fmt.Errorf("parse children: %w", err)
+		}
+		for _, child := range page.Results {
+			if !contentTypeAllowed(opts.Types, child.Type) {
+				continue
+			}
+			out = append(out, child)
+			if len(out) == opts.Limit {
+				break
+			}
+		}
+
+		next := nextPageURL(headers, page.Links.Next)
+		if next == "" || len(page.Results) == 0 || len(out) == opts.Limit {
+			break
+		}
+		path, params, err = nextPageRequest(c, next)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return out, nil
+}
+
+func listDirectChildrenServerV1(ctx context.Context, c *client.Client, id string, opts DirectChildrenOptions) ([]Content, error) {
+	types := opts.Types
+	if len(types) == 0 {
+		types = []string{"page", "comment", "attachment"}
+	}
+	params := url.Values{
+		"limit":  {strconv.Itoa(opts.Limit)},
+		"expand": {strings.Join(types, ",")},
+	}
+	path := "/rest/api/content/" + url.PathEscape(id) + "/child"
+	data, _, err := c.Get(ctx, path, params)
+	if err != nil {
+		return nil, err
+	}
+	var page struct {
+		Results []Content `json:"results"`
+	}
+	if err := json.Unmarshal(data, &page); err != nil {
+		return nil, fmt.Errorf("parse direct children: %w", err)
+	}
+	out := make([]Content, 0, len(page.Results))
+	for _, child := range page.Results {
+		if !contentTypeAllowed(types, child.Type) {
+			continue
+		}
+		out = append(out, child)
+		if len(out) == opts.Limit {
+			break
+		}
+	}
+	return out, nil
+}
+
+func normalizeContentTypes(types []string) []string {
+	out := make([]string, 0, len(types))
+	seen := map[string]bool{}
+	for _, raw := range types {
+		for _, part := range strings.Split(raw, ",") {
+			typ := strings.ToLower(strings.TrimSpace(part))
+			if typ == "" || seen[typ] {
+				continue
+			}
+			seen[typ] = true
+			out = append(out, typ)
+		}
+	}
+	return out
+}
+
+func contentTypeAllowed(types []string, typ string) bool {
+	if len(types) == 0 {
+		return true
+	}
+	typ = strings.ToLower(strings.TrimSpace(typ))
+	for _, allowed := range types {
+		if typ == allowed {
+			return true
+		}
+	}
+	return false
+}
+
+// ListPageDescendants returns page descendants in top-to-bottom order where the
+// provider offers it. Server/DC does not document page descendants through the
+// descendant endpoint, so it walks the documented child page route.
+func ListPageDescendants(ctx context.Context, c *client.Client, id string, opts PageDescendantsOptions) ([]Content, error) {
+	if id == "" {
+		return nil, fmt.Errorf("ListPageDescendants: ID is required")
+	}
+	opts.Limit = clampLimit(opts.Limit)
+	if isCloud(c) {
+		return listPageDescendantsCloudV2(ctx, c, id, opts)
+	}
+	return listPageDescendantsServerV1(ctx, c, id, opts)
+}
+
+func listPageDescendantsCloudV2(ctx context.Context, c *client.Client, id string, opts PageDescendantsOptions) ([]Content, error) {
+	params := url.Values{
+		"limit": {strconv.Itoa(opts.Limit)},
+	}
+	if opts.Depth > 0 {
+		params.Set("depth", strconv.Itoa(opts.Depth))
+	}
+	path := "/api/v2/pages/" + url.PathEscape(id) + "/descendants"
+	out := make([]Content, 0, opts.Limit)
+	for len(out) < opts.Limit {
+		data, headers, err := c.Get(ctx, path, params)
+		if err != nil {
+			return nil, err
+		}
+		var page struct {
+			Results []Content `json:"results"`
+			Links   struct {
+				Next string `json:"next,omitempty"`
+			} `json:"_links"`
+		}
+		if err := json.Unmarshal(data, &page); err != nil {
+			return nil, fmt.Errorf("parse descendants: %w", err)
+		}
+		for _, descendant := range page.Results {
+			out = append(out, descendant)
+			if len(out) == opts.Limit {
+				break
+			}
+		}
+		next := nextPageURL(headers, page.Links.Next)
+		if next == "" || len(page.Results) == 0 || len(out) == opts.Limit {
+			break
+		}
+		path, params, err = nextPageRequest(c, next)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return out, nil
+}
+
+func listPageDescendantsServerV1(ctx context.Context, c *client.Client, id string, opts PageDescendantsOptions) ([]Content, error) {
+	type queuedPage struct {
+		id    string
+		depth int
+	}
+	queue := []queuedPage{{id: id}}
+	visited := map[string]bool{}
+	out := make([]Content, 0, opts.Limit)
+	for len(queue) > 0 && len(out) < opts.Limit {
+		current := queue[0]
+		queue = queue[1:]
+		if visited[current.id] {
+			continue
+		}
+		visited[current.id] = true
+		children, err := GetChildren(ctx, c, current.id, "page", opts.Limit)
+		if err != nil {
+			return nil, err
+		}
+		childDepth := current.depth + 1
+		for _, child := range children {
+			child.ParentID = current.id
+			child.Depth = childDepth
+			out = append(out, child)
+			if len(out) == opts.Limit {
+				break
+			}
+			if opts.Depth <= 0 || childDepth < opts.Depth {
+				queue = append(queue, queuedPage{id: child.ID, depth: childDepth})
+			}
+		}
+	}
+	return out, nil
 }
 
 // GetAncestors walks parents of a content id.
