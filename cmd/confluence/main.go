@@ -83,6 +83,7 @@ Workflow:
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
   confluence macro body --page 12345 --version 2 --macro-id id  Fetch macro body
   confluence template list --limit 10                       Cloud content templates
+  confluence permission space list --space ENG --json       Space permission assignments
   confluence search all "release process" --json            Unified fan-out (code/space/user/attachment)
   confluence api /rest/api/user/current                     Raw REST passthrough`, version, buildTime, commit),
 		SilenceUsage:  true,
@@ -114,6 +115,7 @@ Workflow:
 	root.AddCommand(userCmd())
 	root.AddCommand(groupCmd())
 	root.AddCommand(watcherCmd())
+	root.AddCommand(permissionCmd())
 	root.AddCommand(restrictionCmd())
 	root.AddCommand(searchCmd())
 	root.AddCommand(apiCmd())

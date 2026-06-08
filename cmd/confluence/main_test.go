@@ -95,6 +95,9 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"watcher", "content"},
 		{"watcher", "space"},
 		{"watcher", "status"},
+		{"permission", "space", "list"},
+		{"permission", "space", "available"},
+		{"permission", "space", "subject"},
 		{"restriction", "list"},
 		{"search", "content"},
 		{"search", "spaces"},
@@ -145,6 +148,9 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"watcher", "content"},
 		{"watcher", "space"},
 		{"watcher", "status"},
+		{"permission", "space", "list"},
+		{"permission", "space", "available"},
+		{"permission", "space", "subject"},
 		{"restriction", "list"},
 		{"search", "all"},
 		{"api"},
@@ -331,6 +337,27 @@ func TestLabelCommandsHaveTypedReadFlags(t *testing.T) {
 	for _, want := range []string{"--label", "--space", "--limit"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("label related --help missing %s:\n%s", want, help)
+		}
+	}
+}
+
+func TestPermissionSpaceCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"permission", "space", "list"})
+	for _, want := range []string{"--space", "--limit"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("permission space list --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"permission", "space", "available"})
+	if !strings.Contains(help, "--limit") {
+		t.Fatalf("permission space available --help missing --limit:\n%s", help)
+	}
+
+	help = captureHelp(t, []string{"permission", "space", "subject"})
+	for _, want := range []string{"--space", "--anonymous", "--group", "--user-key", "--limit"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("permission space subject --help missing %s:\n%s", want, help)
 		}
 	}
 }

@@ -35,6 +35,7 @@ func commentCmd() *cobra.Command     { return commentCmdReal() }
 func userCmd() *cobra.Command        { return userCmdReal() }
 func groupCmd() *cobra.Command       { return groupCmdReal() }
 func watcherCmd() *cobra.Command     { return watcherCmdReal() }
+func permissionCmd() *cobra.Command  { return permissionCmdReal() }
 func restrictionCmd() *cobra.Command { return restrictionCmdReal() }
 func searchCmd() *cobra.Command      { return searchCmdReal() }
 func apiCmd() *cobra.Command         { return apiCmdReal() }
