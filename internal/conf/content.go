@@ -69,6 +69,7 @@ type PageDescendantsOptions struct {
 type DirectChildrenOptions struct {
 	Limit int
 	Types []string
+	Sort  string
 }
 
 // Label is a content label.
@@ -219,42 +220,7 @@ func ListDirectChildren(ctx context.Context, c *client.Client, id string, opts D
 
 func listDirectChildrenCloudV2(ctx context.Context, c *client.Client, id string, opts DirectChildrenOptions) ([]Content, error) {
 	path := "/api/v2/pages/" + url.PathEscape(id) + "/direct-children"
-	params := url.Values{"limit": {strconv.Itoa(opts.Limit)}}
-	out := make([]Content, 0, opts.Limit)
-	for len(out) < opts.Limit {
-		data, headers, err := c.Get(ctx, path, params)
-		if err != nil {
-			return nil, err
-		}
-		var page struct {
-			Results []Content `json:"results"`
-			Links   struct {
-				Next string `json:"next,omitempty"`
-			} `json:"_links"`
-		}
-		if err := json.Unmarshal(data, &page); err != nil {
-			return nil, fmt.Errorf("parse children: %w", err)
-		}
-		for _, child := range page.Results {
-			if !contentTypeAllowed(opts.Types, child.Type) {
-				continue
-			}
-			out = append(out, child)
-			if len(out) == opts.Limit {
-				break
-			}
-		}
-
-		next := nextPageURL(headers, page.Links.Next)
-		if next == "" || len(page.Results) == 0 || len(out) == opts.Limit {
-			break
-		}
-		path, params, err = nextPageRequest(c, next)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return out, nil
+	return listCloudDirectChildren(ctx, c, path, opts)
 }
 
 func listDirectChildrenServerV1(ctx context.Context, c *client.Client, id string, opts DirectChildrenOptions) ([]Content, error) {

@@ -40,6 +40,8 @@ confluence doctor                                         Health + auth + flavor
   confluence operation list --page 12345                    Permitted operations
   confluence like count --page 12345                         Cloud like count
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
+  confluence database view 12345 --json                     Cloud database details
+  confluence folder children 12345 --json                   Cloud content-tree children
   confluence macro body --page 12345 --version 2 --macro-id id  Fetch macro body
   confluence template list --limit 10                       Cloud content templates
   confluence permission space list --space ENG --json       Space permission assignments
@@ -59,8 +61,10 @@ confluence
 - `blogpost` - Blog posts (list, view, create, update, delete, purge)
 - `body` - Content body utilities
 - `comment` - Comments (list/add/update/delete)
+- `database` - Database reads
 - `docs` - Generate CLI reference documentation
 - `doctor` - Verify environment, auth, and flavor detection
+- `folder` - Folder reads
 - `group` - Groups (list, members)
 - `label` - Content and space labels
 - `like` - Cloud likes (count, users)
@@ -71,12 +75,14 @@ confluence
 - `property` - Content and space properties
 - `restriction` - Content restrictions (list)
 - `search` - Search content, spaces, users, attachments, or all
+- `smart-link` - Smart Link reads
 - `space` - Spaces (list, view)
 - `task` - Tasks (list, view, complete, reopen, long)
 - `template` - Cloud content and blueprint templates
 - `user` - Users (current, view, search)
 - `version` - Print version, build time, and commit
 - `watcher` - Watchers (content, space, status)
+- `whiteboard` - Whiteboard reads
 
 ## Options
 

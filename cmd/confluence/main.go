@@ -81,6 +81,8 @@ Workflow:
   confluence operation list --page 12345                    Permitted operations
   confluence like count --page 12345                         Cloud like count
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
+  confluence database view 12345 --json                     Cloud database details
+  confluence folder children 12345 --json                   Cloud content-tree children
   confluence macro body --page 12345 --version 2 --macro-id id  Fetch macro body
   confluence template list --limit 10                       Cloud content templates
   confluence permission space list --space ENG --json       Space permission assignments
@@ -109,6 +111,10 @@ Workflow:
 	root.AddCommand(operationCmd())
 	root.AddCommand(likeCmd())
 	root.AddCommand(bodyCmd())
+	root.AddCommand(databaseCmd())
+	root.AddCommand(folderCmd())
+	root.AddCommand(whiteboardCmd())
+	root.AddCommand(smartLinkCmd())
 	root.AddCommand(macroCmd())
 	root.AddCommand(templateCmd())
 	root.AddCommand(commentCmd())

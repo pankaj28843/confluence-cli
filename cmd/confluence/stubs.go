@@ -29,6 +29,10 @@ func taskCmd() *cobra.Command        { return taskCmdReal() }
 func operationCmd() *cobra.Command   { return operationCmdReal() }
 func likeCmd() *cobra.Command        { return likeCmdReal() }
 func bodyCmd() *cobra.Command        { return bodyCmdReal() }
+func databaseCmd() *cobra.Command    { return databaseCmdReal() }
+func folderCmd() *cobra.Command      { return folderCmdReal() }
+func whiteboardCmd() *cobra.Command  { return whiteboardCmdReal() }
+func smartLinkCmd() *cobra.Command   { return smartLinkCmdReal() }
 func macroCmd() *cobra.Command       { return macroCmdReal() }
 func templateCmd() *cobra.Command    { return templateCmdReal() }
 func commentCmd() *cobra.Command     { return commentCmdReal() }

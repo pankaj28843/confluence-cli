@@ -78,6 +78,14 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"like", "count"},
 		{"like", "users"},
 		{"body", "convert"},
+		{"database", "view"},
+		{"database", "children"},
+		{"folder", "view"},
+		{"folder", "children"},
+		{"whiteboard", "view"},
+		{"whiteboard", "children"},
+		{"smart-link", "view"},
+		{"smart-link", "children"},
 		{"macro", "body"},
 		{"template", "list"},
 		{"template", "blueprint", "list"},
@@ -136,6 +144,14 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"like", "count"},
 		{"like", "users"},
 		{"body", "convert"},
+		{"database", "view"},
+		{"database", "children"},
+		{"folder", "view"},
+		{"folder", "children"},
+		{"whiteboard", "view"},
+		{"whiteboard", "children"},
+		{"smart-link", "view"},
+		{"smart-link", "children"},
 		{"macro", "body"},
 		{"template", "list"},
 		{"template", "blueprint", "list"},
@@ -358,6 +374,24 @@ func TestPermissionSpaceCommandsHaveTypedReadFlags(t *testing.T) {
 	for _, want := range []string{"--space", "--anonymous", "--group", "--user-key", "--limit"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("permission space subject --help missing %s:\n%s", want, help)
+		}
+	}
+}
+
+func TestContentTreeCommandsHaveTypedReadFlags(t *testing.T) {
+	for _, group := range []string{"database", "folder", "whiteboard", "smart-link"} {
+		help := captureHelp(t, []string{group, "view"})
+		for _, want := range []string{"--include-collaborators", "--include-direct-children", "--include-operations", "--include-properties"} {
+			if !strings.Contains(help, want) {
+				t.Fatalf("%s view --help missing %s:\n%s", group, want, help)
+			}
+		}
+
+		help = captureHelp(t, []string{group, "children"})
+		for _, want := range []string{"--limit", "--sort", "--type"} {
+			if !strings.Contains(help, want) {
+				t.Fatalf("%s children --help missing %s:\n%s", group, want, help)
+			}
 		}
 	}
 }
