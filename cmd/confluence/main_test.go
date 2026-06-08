@@ -86,6 +86,12 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"audit", "list"},
 		{"audit", "since"},
 		{"audit", "retention"},
+		{"content-state", "current"},
+		{"content-state", "available"},
+		{"content-state", "custom"},
+		{"content-state", "space"},
+		{"content-state", "settings"},
+		{"content-state", "content"},
 		{"database", "view"},
 		{"database", "children"},
 		{"folder", "view"},
@@ -177,6 +183,12 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"audit", "list"},
 		{"audit", "since"},
 		{"audit", "retention"},
+		{"content-state", "current"},
+		{"content-state", "available"},
+		{"content-state", "custom"},
+		{"content-state", "space"},
+		{"content-state", "settings"},
+		{"content-state", "content"},
 		{"database", "view"},
 		{"database", "children"},
 		{"folder", "view"},
@@ -453,6 +465,32 @@ func TestAuditCommandsHaveTypedReadFlags(t *testing.T) {
 	help = captureHelp(t, []string{"audit", "retention"})
 	if !strings.Contains(help, "Cloud") {
 		t.Fatalf("audit retention --help missing Cloud scope:\n%s", help)
+	}
+}
+
+func TestContentStateCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"content-state", "current"})
+	if !strings.Contains(help, "--status") {
+		t.Fatalf("content-state current --help missing --status:\n%s", help)
+	}
+
+	help = captureHelp(t, []string{"content-state", "content"})
+	for _, want := range []string{"--state-id", "--limit", "--start", "--expand"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("content-state content --help missing %s:\n%s", want, help)
+		}
+	}
+
+	for _, path := range [][]string{
+		{"content-state", "available"},
+		{"content-state", "custom"},
+		{"content-state", "space"},
+		{"content-state", "settings"},
+	} {
+		help = captureHelp(t, path)
+		if !strings.Contains(help, "Cloud") {
+			t.Fatalf("%s --help missing Cloud scope:\n%s", strings.Join(path, " "), help)
+		}
 	}
 }
 

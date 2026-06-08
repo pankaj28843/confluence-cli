@@ -82,6 +82,7 @@ Workflow:
   confluence like count --page 12345                         Cloud like count
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
   confluence audit list --limit 25 --json                    Audit log records
+  confluence content-state current 12345                    Cloud content state
   confluence database view 12345 --json                     Cloud database details
   confluence folder children 12345 --json                   Cloud content-tree children
   confluence custom-content list --type ac:example --json   Cloud custom content
@@ -114,6 +115,7 @@ Workflow:
 	root.AddCommand(likeCmd())
 	root.AddCommand(bodyCmd())
 	root.AddCommand(auditCmd())
+	root.AddCommand(contentStateCmd())
 	root.AddCommand(databaseCmd())
 	root.AddCommand(folderCmd())
 	root.AddCommand(whiteboardCmd())

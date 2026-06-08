@@ -41,6 +41,7 @@ confluence doctor                                         Health + auth + flavor
   confluence like count --page 12345                         Cloud like count
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
   confluence audit list --limit 25 --json                    Audit log records
+  confluence content-state current 12345                    Cloud content state
   confluence database view 12345 --json                     Cloud database details
   confluence folder children 12345 --json                   Cloud content-tree children
   confluence custom-content list --type ac:example --json   Cloud custom content
@@ -64,6 +65,7 @@ confluence
 - `blogpost` - Blog posts (list, view, versions, version, create, update, delete, purge)
 - `body` - Content body utilities
 - `comment` - Comments (list/versions/version/add/update/delete)
+- `content-state` - Cloud content state reads
 - `custom-content` - Cloud custom content reads
 - `database` - Database reads
 - `docs` - Generate CLI reference documentation
