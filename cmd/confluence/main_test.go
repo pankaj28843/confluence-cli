@@ -83,6 +83,9 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"like", "count"},
 		{"like", "users"},
 		{"body", "convert"},
+		{"audit", "list"},
+		{"audit", "since"},
+		{"audit", "retention"},
 		{"database", "view"},
 		{"database", "children"},
 		{"folder", "view"},
@@ -171,6 +174,9 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"like", "count"},
 		{"like", "users"},
 		{"body", "convert"},
+		{"audit", "list"},
+		{"audit", "since"},
+		{"audit", "retention"},
 		{"database", "view"},
 		{"database", "children"},
 		{"folder", "view"},
@@ -426,6 +432,27 @@ func TestUserAndGroupCommandsHaveTypedReadFlags(t *testing.T) {
 				t.Fatalf("%s --help missing %s:\n%s", strings.Join(path, " "), want, help)
 			}
 		}
+	}
+}
+
+func TestAuditCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"audit", "list"})
+	for _, want := range []string{"--limit", "--start-date", "--end-date", "--search"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("audit list --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"audit", "since"})
+	for _, want := range []string{"--number", "--unit", "--limit", "--search"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("audit since --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"audit", "retention"})
+	if !strings.Contains(help, "Cloud") {
+		t.Fatalf("audit retention --help missing Cloud scope:\n%s", help)
 	}
 }
 

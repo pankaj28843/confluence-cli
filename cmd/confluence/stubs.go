@@ -29,6 +29,7 @@ func taskCmd() *cobra.Command          { return taskCmdReal() }
 func operationCmd() *cobra.Command     { return operationCmdReal() }
 func likeCmd() *cobra.Command          { return likeCmdReal() }
 func bodyCmd() *cobra.Command          { return bodyCmdReal() }
+func auditCmd() *cobra.Command         { return auditCmdReal() }
 func databaseCmd() *cobra.Command      { return databaseCmdReal() }
 func folderCmd() *cobra.Command        { return folderCmdReal() }
 func whiteboardCmd() *cobra.Command    { return whiteboardCmdReal() }
