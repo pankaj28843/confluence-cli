@@ -34,6 +34,7 @@ type Version struct {
 	BlogPost            *Content    `json:"blogpost,omitempty"`
 	Attachment          *Attachment `json:"attachment,omitempty"`
 	Comment             *Comment    `json:"comment,omitempty"`
+	Custom              *Content    `json:"custom,omitempty"`
 	By                  struct {
 		DisplayName string `json:"displayName,omitempty"`
 		PublicName  string `json:"publicName,omitempty"`

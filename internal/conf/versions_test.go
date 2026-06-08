@@ -22,6 +22,7 @@ func TestListVersionsCloudUsesV2DocumentedEndpoints(t *testing.T) {
 		{name: "attachment", target: "attachment", wantPath: "/wiki/api/v2/attachments/12345/versions"},
 		{name: "footer comment", target: "footer-comment", wantPath: "/wiki/api/v2/footer-comments/12345/versions", wantBody: true},
 		{name: "inline comment", target: "inline-comment", wantPath: "/wiki/api/v2/inline-comments/12345/versions", wantBody: true},
+		{name: "custom content", target: "custom-content", wantPath: "/wiki/api/v2/custom-content/12345/versions", wantBody: true},
 	}
 
 	for _, tc := range cases {
@@ -119,6 +120,7 @@ func TestGetVersionCloudUsesV2DocumentedEndpoints(t *testing.T) {
 		{name: "attachment", target: "attachment", wantPath: "/wiki/api/v2/attachments/12345/versions/7"},
 		{name: "footer comment", target: "footer-comment", wantPath: "/wiki/api/v2/footer-comments/12345/versions/7"},
 		{name: "inline comment", target: "inline-comment", wantPath: "/wiki/api/v2/inline-comments/12345/versions/7"},
+		{name: "custom content", target: "custom-content", wantPath: "/wiki/api/v2/custom-content/12345/versions/7"},
 	}
 
 	for _, tc := range cases {

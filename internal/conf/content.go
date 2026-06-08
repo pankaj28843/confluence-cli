@@ -11,18 +11,23 @@ import (
 	"github.com/pankaj28843/confluence-cli/internal/client"
 )
 
-// Content is the minimised /rest/api/content{/:id,/search} shape. Handles pages,
-// blogposts, comments, and attachments.
+// Content is the minimised /rest/api/content{/:id,/search} and Cloud v2 content
+// shape. Handles pages, blogposts, comments, attachments, and custom content.
 type Content struct {
-	ID            string `json:"id"`
-	Type          string `json:"type,omitempty"` // page | blogpost | comment | attachment
-	Status        string `json:"status,omitempty"`
-	Title         string `json:"title,omitempty"`
-	ParentID      string `json:"parentId,omitempty"`
-	SpaceID       string `json:"spaceId,omitempty"`
-	Depth         int    `json:"depth,omitempty"`
-	ChildPosition int    `json:"childPosition,omitempty"`
-	Space         struct {
+	ID              string `json:"id"`
+	Type            string `json:"type,omitempty"` // page | blogpost | comment | attachment
+	Status          string `json:"status,omitempty"`
+	Title           string `json:"title,omitempty"`
+	ParentID        string `json:"parentId,omitempty"`
+	SpaceID         string `json:"spaceId,omitempty"`
+	PageID          string `json:"pageId,omitempty"`
+	BlogPostID      string `json:"blogPostId,omitempty"`
+	CustomContentID string `json:"customContentId,omitempty"`
+	AuthorID        string `json:"authorId,omitempty"`
+	CreatedAt       string `json:"createdAt,omitempty"`
+	Depth           int    `json:"depth,omitempty"`
+	ChildPosition   int    `json:"childPosition,omitempty"`
+	Space           struct {
 		Key  string `json:"key,omitempty"`
 		Name string `json:"name,omitempty"`
 	} `json:"space,omitempty"`
@@ -37,6 +42,7 @@ type Content struct {
 		} `json:"by,omitempty"`
 	} `json:"version,omitempty"`
 	Body struct {
+		Raw     any `json:"raw,omitempty"`
 		Storage struct {
 			Value          string `json:"value,omitempty"`
 			Representation string `json:"representation,omitempty"`
@@ -44,7 +50,20 @@ type Content struct {
 		View struct {
 			Value string `json:"value,omitempty"`
 		} `json:"view,omitempty"`
+		AtlasDocFormat any `json:"atlas_doc_format,omitempty"`
 	} `json:"body,omitempty"`
+	Labels struct {
+		Results []Label `json:"results,omitempty"`
+	} `json:"labels,omitempty"`
+	Properties struct {
+		Results []Property `json:"results,omitempty"`
+	} `json:"properties,omitempty"`
+	Operations struct {
+		Results []Operation `json:"results,omitempty"`
+	} `json:"operations,omitempty"`
+	Versions struct {
+		Results []Version `json:"results,omitempty"`
+	} `json:"versions,omitempty"`
 	Metadata struct {
 		Labels struct {
 			Results []Label `json:"results,omitempty"`

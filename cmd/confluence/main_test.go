@@ -91,6 +91,14 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"whiteboard", "children"},
 		{"smart-link", "view"},
 		{"smart-link", "children"},
+		{"custom-content", "list"},
+		{"custom-content", "page"},
+		{"custom-content", "blogpost"},
+		{"custom-content", "space"},
+		{"custom-content", "view"},
+		{"custom-content", "children"},
+		{"custom-content", "versions"},
+		{"custom-content", "version"},
 		{"macro", "body"},
 		{"template", "list"},
 		{"template", "blueprint", "list"},
@@ -165,6 +173,14 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"whiteboard", "children"},
 		{"smart-link", "view"},
 		{"smart-link", "children"},
+		{"custom-content", "list"},
+		{"custom-content", "page"},
+		{"custom-content", "blogpost"},
+		{"custom-content", "space"},
+		{"custom-content", "view"},
+		{"custom-content", "children"},
+		{"custom-content", "versions"},
+		{"custom-content", "version"},
 		{"macro", "body"},
 		{"template", "list"},
 		{"template", "blueprint", "list"},
@@ -412,7 +428,7 @@ func TestContentTreeCommandsHaveTypedReadFlags(t *testing.T) {
 }
 
 func TestVersionCommandsHaveTypedReadFlags(t *testing.T) {
-	for _, group := range []string{"page", "blogpost"} {
+	for _, group := range []string{"page", "blogpost", "custom-content"} {
 		help := captureHelp(t, []string{group, "versions"})
 		for _, want := range []string{"--limit", "--sort", "--body-format"} {
 			if !strings.Contains(help, want) {
@@ -446,6 +462,48 @@ func TestVersionCommandsHaveTypedReadFlags(t *testing.T) {
 	for _, want := range []string{"<number>", "--location"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("comment version --help missing %s:\n%s", want, help)
+		}
+	}
+}
+
+func TestCustomContentCommandsHaveTypedReadFlags(t *testing.T) {
+	help := captureHelp(t, []string{"custom-content", "list"})
+	for _, want := range []string{"--type", "--id", "--space-id", "--limit", "--sort", "--body-format"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("custom-content list --help missing %s:\n%s", want, help)
+		}
+	}
+
+	for _, leaf := range []string{"page", "blogpost"} {
+		help = captureHelp(t, []string{"custom-content", leaf})
+		for _, want := range []string{"--type", "--limit", "--sort", "--body-format"} {
+			if !strings.Contains(help, want) {
+				t.Fatalf("custom-content %s --help missing %s:\n%s", leaf, want, help)
+			}
+		}
+	}
+
+	help = captureHelp(t, []string{"custom-content", "space"})
+	for _, want := range []string{"--type", "--limit", "--body-format"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("custom-content space --help missing %s:\n%s", want, help)
+		}
+	}
+	if strings.Contains(help, "--sort") {
+		t.Fatalf("custom-content space --help should not expose undocumented --sort:\n%s", help)
+	}
+
+	help = captureHelp(t, []string{"custom-content", "view"})
+	for _, want := range []string{"--body-format", "--version", "--include-labels", "--include-properties", "--include-operations", "--include-versions", "--include-version", "--include-collaborators"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("custom-content view --help missing %s:\n%s", want, help)
+		}
+	}
+
+	help = captureHelp(t, []string{"custom-content", "children"})
+	for _, want := range []string{"--limit", "--sort", "--type"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("custom-content children --help missing %s:\n%s", want, help)
 		}
 	}
 }

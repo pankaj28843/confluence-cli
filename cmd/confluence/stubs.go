@@ -19,30 +19,31 @@ func notImplemented(what string) error {
 // implementation via a *Real() function and edits this file.
 //
 // Live groups (edit entries here to point at the real cmd):
-func spaceCmd() *cobra.Command       { return spaceCmdReal() }
-func pageCmd() *cobra.Command        { return pageCmdReal() }
-func blogpostCmd() *cobra.Command    { return blogpostCmdReal() }
-func attachmentCmd() *cobra.Command  { return attachmentCmdReal() }
-func labelCmd() *cobra.Command       { return labelCmdReal() }
-func propertyCmd() *cobra.Command    { return propertyCmdReal() }
-func taskCmd() *cobra.Command        { return taskCmdReal() }
-func operationCmd() *cobra.Command   { return operationCmdReal() }
-func likeCmd() *cobra.Command        { return likeCmdReal() }
-func bodyCmd() *cobra.Command        { return bodyCmdReal() }
-func databaseCmd() *cobra.Command    { return databaseCmdReal() }
-func folderCmd() *cobra.Command      { return folderCmdReal() }
-func whiteboardCmd() *cobra.Command  { return whiteboardCmdReal() }
-func smartLinkCmd() *cobra.Command   { return smartLinkCmdReal() }
-func macroCmd() *cobra.Command       { return macroCmdReal() }
-func templateCmd() *cobra.Command    { return templateCmdReal() }
-func commentCmd() *cobra.Command     { return commentCmdReal() }
-func userCmd() *cobra.Command        { return userCmdReal() }
-func groupCmd() *cobra.Command       { return groupCmdReal() }
-func watcherCmd() *cobra.Command     { return watcherCmdReal() }
-func permissionCmd() *cobra.Command  { return permissionCmdReal() }
-func restrictionCmd() *cobra.Command { return restrictionCmdReal() }
-func searchCmd() *cobra.Command      { return searchCmdReal() }
-func apiCmd() *cobra.Command         { return apiCmdReal() }
+func spaceCmd() *cobra.Command         { return spaceCmdReal() }
+func pageCmd() *cobra.Command          { return pageCmdReal() }
+func blogpostCmd() *cobra.Command      { return blogpostCmdReal() }
+func attachmentCmd() *cobra.Command    { return attachmentCmdReal() }
+func labelCmd() *cobra.Command         { return labelCmdReal() }
+func propertyCmd() *cobra.Command      { return propertyCmdReal() }
+func taskCmd() *cobra.Command          { return taskCmdReal() }
+func operationCmd() *cobra.Command     { return operationCmdReal() }
+func likeCmd() *cobra.Command          { return likeCmdReal() }
+func bodyCmd() *cobra.Command          { return bodyCmdReal() }
+func databaseCmd() *cobra.Command      { return databaseCmdReal() }
+func folderCmd() *cobra.Command        { return folderCmdReal() }
+func whiteboardCmd() *cobra.Command    { return whiteboardCmdReal() }
+func smartLinkCmd() *cobra.Command     { return smartLinkCmdReal() }
+func customContentCmd() *cobra.Command { return customContentCmdReal() }
+func macroCmd() *cobra.Command         { return macroCmdReal() }
+func templateCmd() *cobra.Command      { return templateCmdReal() }
+func commentCmd() *cobra.Command       { return commentCmdReal() }
+func userCmd() *cobra.Command          { return userCmdReal() }
+func groupCmd() *cobra.Command         { return groupCmdReal() }
+func watcherCmd() *cobra.Command       { return watcherCmdReal() }
+func permissionCmd() *cobra.Command    { return permissionCmdReal() }
+func restrictionCmd() *cobra.Command   { return restrictionCmdReal() }
+func searchCmd() *cobra.Command        { return searchCmdReal() }
+func apiCmd() *cobra.Command           { return apiCmdReal() }
 
 func doctorCmd() *cobra.Command {
 	return &cobra.Command{
