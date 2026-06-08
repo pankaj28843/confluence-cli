@@ -86,6 +86,8 @@ func TestExamplesHelpBlocks(t *testing.T) {
 		{"audit", "list"},
 		{"audit", "since"},
 		{"audit", "retention"},
+		{"analytics", "views"},
+		{"analytics", "viewers"},
 		{"content-state", "current"},
 		{"content-state", "available"},
 		{"content-state", "custom"},
@@ -183,6 +185,8 @@ func TestJSONFlagReachesAllCommands(t *testing.T) {
 		{"audit", "list"},
 		{"audit", "since"},
 		{"audit", "retention"},
+		{"analytics", "views"},
+		{"analytics", "viewers"},
 		{"content-state", "current"},
 		{"content-state", "available"},
 		{"content-state", "custom"},
@@ -490,6 +494,20 @@ func TestContentStateCommandsHaveTypedReadFlags(t *testing.T) {
 		help = captureHelp(t, path)
 		if !strings.Contains(help, "Cloud") {
 			t.Fatalf("%s --help missing Cloud scope:\n%s", strings.Join(path, " "), help)
+		}
+	}
+}
+
+func TestAnalyticsCommandsHaveTypedReadFlags(t *testing.T) {
+	for _, path := range [][]string{
+		{"analytics", "views"},
+		{"analytics", "viewers"},
+	} {
+		help := captureHelp(t, path)
+		for _, want := range []string{"--from-date", "Cloud"} {
+			if !strings.Contains(help, want) {
+				t.Fatalf("%s --help missing %s:\n%s", strings.Join(path, " "), want, help)
+			}
 		}
 	}
 }

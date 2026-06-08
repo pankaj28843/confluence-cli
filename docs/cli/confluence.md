@@ -41,6 +41,7 @@ confluence doctor                                         Health + auth + flavor
   confluence like count --page 12345                         Cloud like count
   confluence body convert --to view --value @body.xml       Convert storage/editor bodies
   confluence audit list --limit 25 --json                    Audit log records
+  confluence analytics views 12345 --json                   Cloud content view count
   confluence content-state current 12345                    Cloud content state
   confluence database view 12345 --json                     Cloud database details
   confluence folder children 12345 --json                   Cloud content-tree children
@@ -59,6 +60,7 @@ confluence
 
 ## Commands
 
+- `analytics` - Cloud content analytics reads
 - `api` - Call any Confluence REST endpoint (escape hatch)
 - `attachment` - Attachments (list, versions, version, download, upload, replace, delete)
 - `audit` - Audit log reads
